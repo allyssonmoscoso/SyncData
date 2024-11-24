@@ -45,6 +45,7 @@ class SyncData
             if (!File.Exists(targetFilePath) || file.LastWriteTime > File.GetLastWriteTime(targetFilePath))
             {
                 file.CopyTo(targetFilePath, true);
+                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {targetFilePath}");
             }
         }
 
@@ -55,6 +56,7 @@ class SyncData
             if (!File.Exists(sourceFilePath) || file.LastWriteTime > File.GetLastWriteTime(sourceFilePath))
             {
                 file.CopyTo(sourceFilePath, true);
+                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {sourceFilePath}");
             }
         }
 
@@ -65,6 +67,7 @@ class SyncData
             if (!Directory.Exists(targetSubDirPath))
             {
                 Directory.CreateDirectory(targetSubDirPath);
+                Console.WriteLine($"Directorio creado: {targetSubDirPath}");
             }
             SynchronizeDirectories(directory.FullName, targetSubDirPath);
         }
@@ -75,6 +78,7 @@ class SyncData
             if (!Directory.Exists(sourceSubDirPath))
             {
                 Directory.CreateDirectory(sourceSubDirPath);
+                Console.WriteLine($"Directorio creado: {sourceSubDirPath}");
             }
             SynchronizeDirectories(directory.FullName, sourceSubDirPath);
         }

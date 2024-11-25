@@ -3,25 +3,22 @@ using System.IO;
 
 class SyncData
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
-        string path1;
-        string path2;
-        Console.WriteLine(
-            "Este programa sincroniza dos directorios, copiando los archivos que no existan en el directorio de destino o que hayan sido modificados en el directorio fuente.");
+        if (args.Length != 2)
+    {
+            Console.WriteLine("Debe proporcionar dos rutas de directorio como argumentos.");
+            return;
+        }
 
-        Console.Write("Ingrese la primera ruta de directorio: ");
-        path1 = Console.ReadLine();
+        string path1 = args[0];
+        string path2 = args[1];
 
-        do
-        {
-            Console.Write("Ingrese la segunda ruta de directorio: ");
-            path2 = Console.ReadLine();
             if (path1 == path2)
             {
-                Console.WriteLine("La segunda ruta no puede ser igual a la primera. Intente nuevamente.");
+            Console.WriteLine("La segunda ruta no puede ser igual a la primera.");
+            return;
             }
-        } while (path1 == path2);
 
         if (Directory.Exists(path1) && Directory.Exists(path2))
         {

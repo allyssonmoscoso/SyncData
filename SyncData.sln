@@ -12,5 +12,7 @@ Global
 		{592139B9-3FEB-4DAC-92AD-674050B34E1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{592139B9-3FEB-4DAC-92AD-674050B34E1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{592139B9-3FEB-4DAC-92AD-674050B34E1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592139B9-3FEB-4DAC-92AD-674050B34E1F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{592139B9-3FEB-4DAC-92AD-674050B34E1F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

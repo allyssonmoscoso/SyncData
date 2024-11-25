@@ -44,8 +44,10 @@ class SyncData
             var targetFilePath = Path.Combine(targetDir, file.Name);
             if (!File.Exists(targetFilePath) || file.LastWriteTime > File.GetLastWriteTime(targetFilePath))
             {
+                var startTime = DateTime.Now;
                 file.CopyTo(targetFilePath, true);
-                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {targetFilePath}");
+                var endTime = DateTime.Now;
+                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {targetFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
             }
         }
 
@@ -55,8 +57,10 @@ class SyncData
             var sourceFilePath = Path.Combine(sourceDir, file.Name);
             if (!File.Exists(sourceFilePath) || file.LastWriteTime > File.GetLastWriteTime(sourceFilePath))
             {
+                var startTime = DateTime.Now;
                 file.CopyTo(sourceFilePath, true);
-                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {sourceFilePath}");
+                var endTime = DateTime.Now;
+                Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {sourceFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
             }
         }
 
@@ -66,8 +70,10 @@ class SyncData
             var targetSubDirPath = Path.Combine(targetDir, directory.Name);
             if (!Directory.Exists(targetSubDirPath))
             {
+                var startTime = DateTime.Now;
                 Directory.CreateDirectory(targetSubDirPath);
-                Console.WriteLine($"Directorio creado: {targetSubDirPath}");
+                var endTime = DateTime.Now;
+                Console.WriteLine($"Directorio creado: {targetSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
             }
             SynchronizeDirectories(directory.FullName, targetSubDirPath);
         }
@@ -77,8 +83,10 @@ class SyncData
             var sourceSubDirPath = Path.Combine(sourceDir, directory.Name);
             if (!Directory.Exists(sourceSubDirPath))
             {
+                var startTime = DateTime.Now;
                 Directory.CreateDirectory(sourceSubDirPath);
-                Console.WriteLine($"Directorio creado: {sourceSubDirPath}");
+                var endTime = DateTime.Now;
+                Console.WriteLine($"Directorio creado: {sourceSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
             }
             SynchronizeDirectories(directory.FullName, sourceSubDirPath);
         }

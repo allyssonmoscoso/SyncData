@@ -48,6 +48,8 @@ dotnet run --project SyncData/SyncData.csproj "C:\SourceDir" "C:\TargetDir" -v -
 ## Project Structure
 
 - `SyncData/Program.cs`: Main application logic for synchronizing directories and files.
+- `SyncData/Utility.cs`: Contains utility functions for directory synchronization and logging.
+- `SyncData/ProgressBar.cs`: Implements a progress bar to display synchronization progress.
 - `SyncData/SyncData.csproj`: Project file containing configuration and dependencies.
 
 ## License

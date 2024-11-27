@@ -9,6 +9,12 @@ SyncData is a console application that synchronizes files and directories betwee
 - Displays progress of synchronization with a progress bar.
 - Verbose mode for detailed logging.
 - Option to log messages to a file.
+- **Upcoming Features:**
+    - Differential synchronization to only copy changed files.
+    - Compression support to reduce data transfer size.
+    - Network synchronization to sync directories over a network.
+    - Exclude specific files or directories from synchronization.
+    - Preserve file permissions and timestamps.
 
 ## Requirements
 

@@ -35,11 +35,11 @@ class SyncData
             if (verbose)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Debe proporcionar dos rutas de directorio como argumentos.");
+                Console.WriteLine("You must provide two directory paths as arguments.");
                 Console.ResetColor();
             }
 
-            LogMessage("Error", "Debe proporcionar dos rutas de directorio como argumentos.", verbose, logToFile);
+            LogMessage("Error", "You must provide two directory paths as arguments.", verbose, logToFile);
             return;
         }
 
@@ -48,11 +48,11 @@ class SyncData
             if (verbose)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("La segunda ruta no puede ser igual a la primera.");
+                Console.WriteLine("The second path cannot be the same as the first.");
                 Console.ResetColor();
             }
 
-            LogMessage("Error", "La segunda ruta no puede ser igual a la primera.", verbose, logToFile);
+            LogMessage("Error", "The second path cannot be the same as the first.", verbose, logToFile);
             return;
         }
 
@@ -62,22 +62,22 @@ class SyncData
             if (verbose)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Sincronización completada.");
+                Console.WriteLine("Synchronization completed.");
                 Console.ResetColor();
             }
 
-            LogMessage("Success", "Sincronización completada.", verbose, logToFile);
+            LogMessage("Success", "Synchronization completed.", verbose, logToFile);
         }
         else
         {
             if (verbose)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Una o ambas rutas no existen.");
+                Console.WriteLine("One or both paths do not exist.");
                 Console.ResetColor();
             }
 
-            LogMessage("Error", "Una o ambas rutas no existen.", verbose, logToFile);
+            LogMessage("Error", "One or both paths do not exist.", verbose, logToFile);
         }
 
         static void LogMessage(string status, string message, bool verbose, bool logToFile)
@@ -90,8 +90,7 @@ class SyncData
         }
 
         static void SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile)
-
-    {
+        {
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
 
@@ -103,7 +102,7 @@ class SyncData
             {
                 int progress = 0;
 
-                // Sincronizar archivos del directorio fuente con el de destino
+                // Synchronize files from source directory to target directory
                 foreach (var file in sourceDirectory.GetFiles())
                 {
                     var targetFilePath = Path.Combine(targetDir, file.Name);
@@ -114,18 +113,18 @@ class SyncData
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {targetFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
-                        Console.ResetColor();
-                    }
-                         LogMessage("Success", $"Archivo sincronizado: {file.FullName} -> {targetFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                            Console.ResetColor();
+                        }
+                        LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
 
-                // Sincronizar archivos del directorio destino con el de fuente
+                // Synchronize files from target directory to source directory
                 foreach (var file in targetDirectory.GetFiles())
                 {
                     var sourceFilePath = Path.Combine(sourceDir, file.Name);
@@ -136,18 +135,18 @@ class SyncData
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Archivo sincronizado: {file.FullName} -> {sourceFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
-                        Console.ResetColor();
-                    }
-                         LogMessage("Success", $"Archivo sincronizado: {file.FullName} -> {sourceFilePath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                            Console.ResetColor();
+                        }
+                        LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
 
-                // Sincronizar subdirectorios
+                // Synchronize subdirectories
                 foreach (var directory in sourceDirectory.GetDirectories())
                 {
                     var targetSubDirPath = Path.Combine(targetDir, directory.Name);
@@ -158,14 +157,14 @@ class SyncData
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Directorio creado: {targetSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
-                        Console.ResetColor();
-                    }
-                         LogMessage("Success", $"Directorio creado: {targetSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine($"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                            Console.ResetColor();
+                        }
+                        LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
-                     SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile);
+                    SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile);
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
@@ -180,14 +179,14 @@ class SyncData
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Directorio creado: {sourceSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)");
-                        Console.ResetColor();
-                    }
-                         LogMessage("Success", $"Directorio creado: {sourceSubDirPath} (Tiempo: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine($"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                            Console.ResetColor();
+                        }
+                        LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
-                     SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile);
+                    SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile);
                     progress++;
                     progressBar.Report(1.0);
                     Console.WriteLine();

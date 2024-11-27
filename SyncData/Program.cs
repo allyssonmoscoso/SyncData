@@ -5,32 +5,32 @@ class SyncData
 {
     public static void Main(string[] args)
     {
-        bool verbose = args.Contains("-v") || args.Contains("-verbose");
-        bool logToFile = args.Contains("-log-file");
-        string path1 = null;
-        string path2 = null;
+        bool verbose = false;
+        bool logToFile = false;
+        string path1 = string.Empty;
+        string path2 = string.Empty;
 
-        for (int i = 0; i < args.Length; i++)
+        foreach (var arg in args)
         {
-            if (args[i] == "-v" || args[i] == "-verbose")
+            if (arg == "-v" || arg == "-verbose")
             {
                 verbose = true;
             }
-            else if (args[i] == "-log-file")
+            else if (arg == "-log-file")
             {
                 logToFile = true;
             }
-            else if (path1 == null)
+            else if (string.IsNullOrEmpty(path1))
             {
-                path1 = args[i];
+                path1 = arg;
             }
-            else if (path2 == null)
+            else if (string.IsNullOrEmpty(path2))
             {
-                path2 = args[i];
+                path2 = arg;
             }
         }
 
-        if (path1 == null || path2 == null)
+        if (string.IsNullOrEmpty(path1) || string.IsNullOrEmpty(path2))
         {
             if (verbose)
             {
@@ -43,7 +43,7 @@ class SyncData
             return;
         }
 
-        if (path1 == path2)
+        if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
         {
             if (verbose)
             {
@@ -85,7 +85,19 @@ class SyncData
             string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}:{status}:{message}";
             if (logToFile)
             {
-                File.AppendAllText("syncData.log", logMessage + Environment.NewLine);
+                try
+                {
+                    File.AppendAllText("syncData.log", logMessage + Environment.NewLine);
+                }
+                catch (IOException ex)
+                {
+                    if (verbose)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Failed to write to log file: {ex.Message}");
+                        Console.ResetColor();
+                    }
+                }
             }
         }
 
@@ -189,7 +201,6 @@ class SyncData
                     SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile);
                     progress++;
                     progressBar.Report(1.0);
-                    Console.WriteLine();
                 }
             }
         }

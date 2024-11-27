@@ -7,6 +7,8 @@ SyncData is a console application that synchronizes files and directories betwee
 - Synchronizes files from source to target directory and vice versa.
 - Creates missing directories in both source and target directories.
 - Displays progress of synchronization with a progress bar.
+- Verbose mode for detailed logging.
+- Option to log messages to a file.
 
 ## Requirements
 
@@ -20,21 +22,21 @@ To run the application, use one of the following commands:
 ### Using `dotnet run`
 
 ```sh
-dotnet run --project SyncData/SyncData.csproj <source_directory> <target_directory>
+dotnet run --project SyncData/SyncData.csproj <source_directory> <target_directory> [-v | -verbose] [-log-file]
 ```
 
 ### Using the compiled executable
 
 ```sh
-SyncData.exe <source_directory> <target_directory>
+SyncData.exe <source_directory> <target_directory> [-v | -verbose] [-log-file]
 ```
 
-Replace `<source_directory>` and `<target_directory>` with the paths of the directories you want to synchronize.
+Replace `<source_directory>` and `<target_directory>` with the paths of the directories you want to synchronize. Use `-v` or `-verbose` for verbose output and `-log-file` to log messages to a file.
 
 ## Example
 
 ```sh
-dotnet run --project SyncData/SyncData.csproj "C:\SourceDir" "C:\TargetDir"
+dotnet run --project SyncData/SyncData.csproj "C:\SourceDir" "C:\TargetDir" -v -log-file
 ```
 
 ## Project Structure

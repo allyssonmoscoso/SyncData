@@ -6,7 +6,7 @@ namespace SyncData
     public static class Utility
     {
 
-        public static void SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile)
+        public static void SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile, List<string> exclude)
         {
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
@@ -18,10 +18,15 @@ namespace SyncData
             using (var progressBar = new ProgressBar())
             {
                 int progress = 0;
-
+                
                 // Synchronize files from source directory to target directory
                 foreach (var file in sourceDirectory.GetFiles())
                 {
+                    if (exclude.Any(e => file.FullName.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                
                     var targetFilePath = Path.Combine(targetDir, file.Name);
                     if (!File.Exists(targetFilePath) || file.LastWriteTime > File.GetLastWriteTime(targetFilePath))
                     {
@@ -40,10 +45,15 @@ namespace SyncData
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
-
+                
                 // Synchronize files from target directory to source directory
                 foreach (var file in targetDirectory.GetFiles())
                 {
+                    if (exclude.Any(e => file.FullName.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                
                     var sourceFilePath = Path.Combine(sourceDir, file.Name);
                     if (!File.Exists(sourceFilePath) || file.LastWriteTime > File.GetLastWriteTime(sourceFilePath))
                     {
@@ -62,10 +72,15 @@ namespace SyncData
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
-
+                
                 // Synchronize subdirectories
                 foreach (var directory in sourceDirectory.GetDirectories())
                 {
+                    if (exclude.Any(e => directory.FullName.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                
                     var targetSubDirPath = Path.Combine(targetDir, directory.Name);
                     if (!Directory.Exists(targetSubDirPath))
                     {
@@ -81,13 +96,18 @@ namespace SyncData
                         Utility.LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
-                    SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile);
+                    SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude);
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
 
                 foreach (var directory in targetDirectory.GetDirectories())
                 {
+                    if (exclude.Any(e => directory.FullName.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                
                     var sourceSubDirPath = Path.Combine(sourceDir, directory.Name);
                     if (!Directory.Exists(sourceSubDirPath))
                     {
@@ -103,7 +123,7 @@ namespace SyncData
                         Utility.LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
-                    SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile);
+                    SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude);
                     progress++;
                     progressBar.Report(1.0);
                 }

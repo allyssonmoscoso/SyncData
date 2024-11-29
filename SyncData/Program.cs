@@ -11,8 +11,8 @@ namespace SyncData
             bool verbose = false;
             bool logToFile = false;
             bool exclude = false;
-            string path1 = string.Empty;
-            string path2 = string.Empty;
+            string source = string.Empty;
+            string target = string.Empty;
             List<string> excludePaths = new List<string>();
 
             foreach (var arg in args)
@@ -30,17 +30,17 @@ namespace SyncData
                     exclude = true;
                     excludePaths.AddRange(arg.Substring(9).Trim('{', '}').Split(',').Where(p => !string.IsNullOrWhiteSpace(p)));
                 }
-                else if (string.IsNullOrEmpty(path1))
-                {
-                    path1 = arg;
+                else if (arg.StartsWith("-source="))
+                {  
+                    source = arg.Substring(8);
                 }
-                else if (string.IsNullOrEmpty(path2))
+                else if (arg.StartsWith("-target="))
                 {
-                    path2 = arg;
+                    target = arg.Substring(8);
                 }
             }
 
-            if (string.IsNullOrEmpty(path1) || string.IsNullOrEmpty(path2))
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You must provide two directory paths as arguments.");
@@ -72,7 +72,7 @@ namespace SyncData
                 }
             
 
-            if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
                 {
                     if (verbose)
                     {
@@ -90,9 +90,9 @@ namespace SyncData
                     
                 }
 
-                if (Directory.Exists(path1) && Directory.Exists(path2))
+                if (Directory.Exists(source) && Directory.Exists(target))
                 {
-                    Utility.SynchronizeDirectories(path1, path2, verbose, logToFile, exclude, excludePaths);
+                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths);
                     if (verbose)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;

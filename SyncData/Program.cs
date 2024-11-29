@@ -10,6 +10,7 @@ namespace SyncData
         {
             bool verbose = false;
             bool logToFile = false;
+            bool exclude = false;
             string path1 = string.Empty;
             string path2 = string.Empty;
             List<string> excludePaths = new List<string>();
@@ -25,8 +26,9 @@ namespace SyncData
                     logToFile = true;
                 }
                 else if (arg.StartsWith("-exclude="))
-                {
-                    excludePaths.Add(arg.Substring(9));
+                {   
+                    exclude = true;
+                    excludePaths.AddRange(arg.Substring(9).Trim('{', '}').Split(',').Where(p => !string.IsNullOrWhiteSpace(p)));
                 }
                 else if (string.IsNullOrEmpty(path1))
                 {
@@ -40,19 +42,37 @@ namespace SyncData
 
             if (string.IsNullOrEmpty(path1) || string.IsNullOrEmpty(path2))
                 {
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("You must provide two directory paths as arguments.");
-                        Console.ResetColor();
-                    }
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("You must provide two directory paths as arguments.");
 
-                    Utility.LogMessage("Error", "You must provide two directory paths as arguments.", verbose,
-                        logToFile);
+                    if (logToFile)
+                    {
+                        Utility.LogMessage("Error", "You must provide two directory paths as arguments.", verbose,
+                            logToFile);
+                    }
                     return;
                 }
 
-                if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
+                if (exclude)
+                {
+                    if (excludePaths.Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("-exclude: You must provide at least one exclude path as an argument.");
+
+                        if (logToFile)
+                        {
+                            Utility.LogMessage("Error", "-exclude: You must provide at least one exclude path as an argument.", verbose,
+                                logToFile);    
+                        }
+                        
+                        
+                        return;
+                    }
+                }
+            
+
+            if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
                 {
                     if (verbose)
                     {
@@ -61,13 +81,18 @@ namespace SyncData
                         Console.ResetColor();
                     }
 
-                    Utility.LogMessage("Error", "The second path cannot be the same as the first.", verbose, logToFile);
+                    if (logToFile)
+                    {
+                        Utility.LogMessage("Error", "The second path cannot be the same as the first.", verbose, logToFile);
+                            
+                    }
                     return;
+                    
                 }
 
                 if (Directory.Exists(path1) && Directory.Exists(path2))
                 {
-                    Utility.SynchronizeDirectories(path1, path2, verbose, logToFile, excludePaths);
+                    Utility.SynchronizeDirectories(path1, path2, verbose, logToFile, exclude, excludePaths);
                     if (verbose)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -75,7 +100,11 @@ namespace SyncData
                         Console.ResetColor();
                     }
 
-                    Utility.LogMessage("Success", "Synchronization completed.", verbose, logToFile);
+                    if (logToFile)
+                    {
+                        Utility.LogMessage("Success", "Synchronization completed.", verbose, logToFile);    
+                    }
+                    
                 }
                 else
                 {
@@ -86,7 +115,11 @@ namespace SyncData
                         Console.ResetColor();
                     }
 
-                    Utility.LogMessage("Error", "One or both paths do not exist.", verbose, logToFile);
+                    if (logToFile)
+                    {
+                        Utility.LogMessage("Error", "One or both paths do not exist.", verbose, logToFile);    
+                    }
+                    
                 }
             }
         }

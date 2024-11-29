@@ -52,7 +52,11 @@ namespace SyncData
                             Console.WriteLine($"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
                             Console.ResetColor();
                         }
-                        Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+
+                        if (logToFile)
+                        {
+                            Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                        }
                     }
 
                     progress++;
@@ -91,7 +95,12 @@ namespace SyncData
                             Console.WriteLine($"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
                             Console.ResetColor();
                         }
-                        Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+
+                        if (logToFile)
+                        {
+                            Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                        }
+   
                     }
 
                     progress++;
@@ -130,7 +139,11 @@ namespace SyncData
                             Console.WriteLine($"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
                             Console.ResetColor();
                         }
-                        Utility.LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+
+                        if (logToFile)
+                        {
+                            Utility.LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);    
+                        }
                     }
 
                     SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths);
@@ -169,7 +182,11 @@ namespace SyncData
                             Console.WriteLine($"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
                             Console.ResetColor();
                         }
-                        Utility.LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+
+                        if (logToFile)
+                        {
+                            Utility.LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                        }
                     }
 
                     SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths);

@@ -4,22 +4,36 @@ SyncData is a console application that synchronizes files and directories betwee
 
 ## Features
 
-- Synchronizes files from source to target directory and vice versa.
-- Creates missing directories in both source and target directories.
-- Displays progress of synchronization with a progress bar.
-- Verbose mode for detailed logging.
-- Option to log messages to a file.
+|||
+| -------- | ------- |
+|  Added | ✅    |
+| Partially added | ⚠️    |
+| Not yet implemented    | 🛑   |
+
+- Synchronizes files from source to target directory and vice versa. ✅
+- Creates missing directories in both source and target directories. ✅
+- Displays progress of synchronization with a progress bar. ✅
+- Verbose mode for detailed logging. ✅
+- Option to log messages to a file. ✅
+- Exclude specific files or directories from synchronization. ⚠️
 - **Upcoming Features:**
-    - Differential synchronization to only copy changed files.
-    - Compression support to reduce data transfer size.
-    - Network synchronization to sync directories over a network.
-    - Exclude specific files or directories from synchronization.
-    - Preserve file permissions and timestamps.
+    - Differential synchronization to only copy changed files. 🛑
+    - Compression support to reduce data transfer size. 🛑
+    - Network synchronization to sync directories over a network. 🛑
+    - Preserve file permissions and timestamps. 🛑
 
 ## Requirements
 
 - .NET 8.0 SDK or later.
 - .NET 8.0 Runtime.
+
+## Parameters
+
+- `-source=<path>`: Specifies the source directory path
+- `-target=<path>`: Specifies the target directory path 
+- `-v` or `-verbose`: Enables detailed output logging
+- `-log-file`: Enables logging to file (syncData.log)
+- `-exclude=path` or `-exclude={path1,path2}`: Excludes specified paths from synchronization 
 
 ## Usage
 

@@ -1,12 +1,39 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SyncData
 {
     public static class Utility
     {
+        private static async Task<bool> UploadFileToFtp(string fileName, string filePath, string ftpServerUrl, string username, string password)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(ftpServerUrl);
+                    var byteArray = new NetworkCredential(username, password).GetCredential(client.BaseAddress, "Basic").Password;
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes($"{username}:{byteArray}")));
 
-        public static void SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile,  bool exclude,List<string> excludePaths)
+                    byte[] fileContents = await File.ReadAllBytesAsync(filePath);
+                    var content = new ByteArrayContent(fileContents);
+                    var response = await client.PutAsync(fileName, content);
+
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error =>", ex);
+            }
+        }
+
+        public static async Task SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile, bool exclude, List<string> excludePaths, bool useFtp, string userFtp, string passwordFtp)
         {
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
@@ -18,28 +45,27 @@ namespace SyncData
             using var progressBar = new ProgressBar();
             {
                 int progress = 0;
-                
+
                 // Synchronize files from source directory to target directory
                 foreach (var file in sourceDirectory.GetFiles())
                 {
                     if (excludePaths.Any(e => file.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
                     {
                         if (verbose)
-                        {   
+                        {
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine("Excluding file: " + file.FullName);
                             Console.ResetColor();
-                            
                         }
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
+                            LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
                         }
-                        
+
                         continue;
                     }
-                
+
                     var targetFilePath = Path.Combine(targetDir, file.Name);
                     if (!File.Exists(targetFilePath) || file.LastWriteTime > File.GetLastWriteTime(targetFilePath))
                     {
@@ -55,34 +81,38 @@ namespace SyncData
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                        }
+
+                        if (useFtp)
+                        {
+                            await UploadFileToFtp(file.Name, targetFilePath, "ftpServerUrl", userFtp, passwordFtp);
                         }
                     }
 
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
-                
+
                 // Synchronize files from target directory to source directory
                 foreach (var file in targetDirectory.GetFiles())
                 {
                     if (excludePaths.Any(e => file.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                    {   
+                    {
                         if (verbose)
                         {
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine("Excluding file: " + file.FullName);
                             Console.ResetColor();
-                            
                         }
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
+                            LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
                         }
                         continue;
                     }
-                
+
                     var sourceFilePath = Path.Combine(sourceDir, file.Name);
                     if (!File.Exists(sourceFilePath) || file.LastWriteTime > File.GetLastWriteTime(sourceFilePath))
                     {
@@ -98,15 +128,19 @@ namespace SyncData
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                         }
-   
+
+                        if (useFtp)
+                        {
+                            await UploadFileToFtp(file.Name, sourceFilePath, "ftpServerUrl", userFtp, passwordFtp);
+                        }
                     }
 
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
-                
+
                 // Synchronize subdirectories
                 foreach (var directory in sourceDirectory.GetDirectories())
                 {
@@ -117,16 +151,15 @@ namespace SyncData
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine("Excluding directory: " + directory.FullName);
                             Console.ResetColor();
-                            
                         }
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
+                            LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
                         }
                         continue;
                     }
-                
+
                     var targetSubDirPath = Path.Combine(targetDir, directory.Name);
                     if (!Directory.Exists(targetSubDirPath))
                     {
@@ -142,11 +175,11 @@ namespace SyncData
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);    
+                            LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                         }
                     }
 
-                    SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths);
+                    await SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, userFtp, passwordFtp);
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
@@ -160,16 +193,15 @@ namespace SyncData
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine("Excluding directory: " + directory.FullName);
                             Console.ResetColor();
-                            
                         }
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
+                            LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
                         }
                         continue;
                     }
-                
+
                     var sourceSubDirPath = Path.Combine(sourceDir, directory.Name);
                     if (!Directory.Exists(sourceSubDirPath))
                     {
@@ -185,11 +217,11 @@ namespace SyncData
 
                         if (logToFile)
                         {
-                            Utility.LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
+                            LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                         }
                     }
 
-                    SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths);
+                    await SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, userFtp, passwordFtp);
                     progress++;
                     progressBar.Report(1.0);
                 }

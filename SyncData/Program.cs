@@ -11,32 +11,39 @@ namespace SyncData
             bool verbose = false;
             bool logToFile = false;
             bool exclude = false;
+            bool ftp = false;
             string source = string.Empty;
             string target = string.Empty;
             List<string> excludePaths = new List<string>();
 
             foreach (var arg in args)
             {
-                if (arg == "-v" || arg == "-verbose")
+                switch (arg)
                 {
-                    verbose = true;
-                }
-                else if (arg == "-log-file")
-                {
-                    logToFile = true;
-                }
-                else if (arg.StartsWith("-exclude="))
-                {   
-                    exclude = true;
-                    excludePaths.AddRange(arg.Substring(9).Trim('{', '}').Split(',').Where(p => !string.IsNullOrWhiteSpace(p)));
-                }
-                else if (arg.StartsWith("-source="))
-                {  
-                    source = arg.Substring(8);
-                }
-                else if (arg.StartsWith("-target="))
-                {
-                    target = arg.Substring(8);
+                    case "-v":
+                    case "-verbose":
+                        verbose = true;
+                        break;
+                    case "-log-file":
+                        logToFile = true;
+                        break;
+                    case  "-exclude=":
+                        exclude = true;
+                        excludePaths.AddRange(arg.Substring(9).Trim('{', '}').Split(',').Where(p => !string.IsNullOrWhiteSpace(p)));
+                        break;
+                    case "-ftp":
+                        ftp = true;
+                        break;   
+                    default:
+                        if (arg.StartsWith("-source="))
+                        {
+                            source = arg.Substring(8);
+                        }
+                        else if (arg.StartsWith("-target="))
+                        {
+                            target = arg.Substring(8);
+                        }
+                        break;
                 }
             }
 
@@ -92,7 +99,7 @@ namespace SyncData
 
                 if (Directory.Exists(source) && Directory.Exists(target))
                 {
-                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths);
+                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp);
                     if (verbose)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;

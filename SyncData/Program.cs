@@ -27,9 +27,9 @@ namespace SyncData
                     case "-log-file":
                         logToFile = true;
                         break;
-                    case  "-exclude=":
+                    case var excludeArg when excludeArg.StartsWith("-exclude="):
                         exclude = true;
-                        excludePaths.AddRange(arg.Substring(9).Trim('{', '}').Split(',').Where(p => !string.IsNullOrWhiteSpace(p)));
+                        excludePaths.AddRange(excludeArg.Substring(9).Trim('{', '}').Split(',').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p)));
                         break;
                     case "-ftp":
                         ftp = true;
@@ -99,7 +99,7 @@ namespace SyncData
 
                 if (Directory.Exists(source) && Directory.Exists(target))
                 {
-                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp);
+                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp, null, null);
                     if (verbose)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;

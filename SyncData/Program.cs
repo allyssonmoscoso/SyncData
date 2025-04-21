@@ -12,6 +12,7 @@ namespace SyncData
             bool logToFile = false;
             bool exclude = false;
             bool ftp = false;
+            bool preservePermissionsAndTimestamps = false;
             string source = string.Empty;
             string target = string.Empty;
             List<string> excludePaths = new List<string>();
@@ -33,7 +34,10 @@ namespace SyncData
                         break;
                     case "-ftp":
                         ftp = true;
-                        break;   
+                        break;
+                    case "-preserve":
+                        preservePermissionsAndTimestamps = true;
+                        break;
                     default:
                         if (arg.StartsWith("-source="))
                         {
@@ -99,7 +103,7 @@ namespace SyncData
 
                 if (Directory.Exists(source) && Directory.Exists(target))
                 {
-                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp, null, null);
+                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp, preservePermissionsAndTimestamps, null, null);
                     if (verbose)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;

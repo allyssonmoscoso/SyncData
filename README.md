@@ -16,11 +16,11 @@ SyncData is a console application that synchronizes files and directories betwee
 - Verbose mode for detailed logging. ✅
 - Option to log messages to a file. ✅
 - Exclude specific files or directories from synchronization. ✅
+- Preserve file permissions and timestamps. ✅
 - **Upcoming Features:**
     - Differential synchronization to only copy changed files. 🛑
     - Compression support to reduce data transfer size. 🛑
     - Network synchronization to sync directories over a network. 🛑
-    - Preserve file permissions and timestamps. 🛑
 
 ## Requirements
 
@@ -33,7 +33,8 @@ SyncData is a console application that synchronizes files and directories betwee
 - `-target=<path>`: Specifies the target directory path 
 - `-v` or `-verbose`: Enables detailed output logging
 - `-log-file`: Enables logging to file (syncData.log)
-- `-exclude=path` or `-exclude=path1,path2`: Excludes specified paths from synchronization 
+- `-exclude=path` or `-exclude=path1,path2`: Excludes specified paths from synchronization
+-  `-preserve`: Preserve file permissions and timestamps.
 
 ## Usage
 
@@ -42,21 +43,21 @@ To run the application, use one of the following commands:
 ### Using `dotnet run`
 
 ```sh
-dotnet run --project SyncData/SyncData.csproj <source_directory> <target_directory> [-v | -verbose] [-log-file] [-exclude=<path1,path2>]
+dotnet run --project SyncData/SyncData.csproj <source_directory> <target_directory> [-v | -verbose] [-log-file] [-exclude=<path1,path2>] [-preserve]
 ```
 
 ### Using the compiled executable
 
 ```sh
-SyncData.exe <source_directory> <target_directory> [-v | -verbose] [-log-file] [-exclude=<path1,path2>]
+SyncData.exe <source_directory> <target_directory> [-v | -verbose] [-log-file] [-exclude=<path1,path2>] [-preserve]
 ```
 
-Replace `<source_directory>` and `<target_directory>` with the paths of the directories you want to synchronize. Use `-v` or `-verbose` for verbose output, `-log-file` to log messages to a file, and `-exclude=<path1,path2>` to exclude specific files or directories from synchronization.
+Replace `<source_directory>` and `<target_directory>` with the paths of the directories you want to synchronize. Use `-v` or `-verbose` for verbose output, `-log-file` to log messages to a file, `-exclude=<path1,path2>` to exclude specific files or directories from synchronization, and `-preserve` to maintain file permissions and timestamps during synchronization.
 
 ## Example
 
 ```sh
-dotnet run --project SyncData/SyncData.csproj "C:\SourceDir" "C:\TargetDir" -v -log-file-exclude="C:\SourceDir\Temp,C:\SourceDir\Logs"
+dotnet run --project SyncData/SyncData.csproj "C:\SourceDir" "C:\TargetDir" -v -log-file -exclude="C:\SourceDir\Temp,C:\SourceDir\Logs" -preserve
 ```
 
 ## License

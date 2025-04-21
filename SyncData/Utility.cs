@@ -33,7 +33,7 @@ namespace SyncData
             }
         }
 
-        public static async Task SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile, bool exclude, List<string> excludePaths, bool useFtp, string userFtp, string passwordFtp)
+        public static async Task SynchronizeDirectories(string sourceDir, string targetDir, bool verbose, bool logToFile, bool exclude, List<string> excludePaths, bool useFtp, bool preservePermissionsAndTimestamps, string userFtp, string passwordFtp)
         {
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
@@ -71,6 +71,11 @@ namespace SyncData
                     {
                         var startTime = DateTime.Now;
                         file.CopyTo(targetFilePath, true);
+                        if (preservePermissionsAndTimestamps)
+                        {
+                            File.SetAttributes(targetFilePath, file.Attributes);
+                            File.SetLastWriteTime(targetFilePath, file.LastWriteTime);
+                        }
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
@@ -118,6 +123,11 @@ namespace SyncData
                     {
                         var startTime = DateTime.Now;
                         file.CopyTo(sourceFilePath, true);
+                        if (preservePermissionsAndTimestamps)
+                        {
+                            File.SetAttributes(sourceFilePath, file.Attributes);
+                            File.SetLastWriteTime(sourceFilePath, file.LastWriteTime);
+                        }
                         var endTime = DateTime.Now;
                         if (verbose)
                         {
@@ -179,7 +189,7 @@ namespace SyncData
                         }
                     }
 
-                    await SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, userFtp, passwordFtp);
+                    await SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, preservePermissionsAndTimestamps, userFtp, passwordFtp);
                     progress++;
                     progressBar.Report((double)progress / totalOperations);
                 }
@@ -221,7 +231,7 @@ namespace SyncData
                         }
                     }
 
-                    await SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, userFtp, passwordFtp);
+                    await SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, preservePermissionsAndTimestamps, userFtp, passwordFtp);
                     progress++;
                     progressBar.Report(1.0);
                 }

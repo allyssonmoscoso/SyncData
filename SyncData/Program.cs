@@ -1,21 +1,48 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SyncData
 {
-
     class Program
     {
         public static void Main(string[] args)
         {
-            bool verbose = false;
-            bool logToFile = false;
-            bool exclude = false;
-            bool ftp = false;
-            bool preservePermissionsAndTimestamps = false;
-            string source = string.Empty;
-            string target = string.Empty;
-            List<string> excludePaths = new List<string>();
+            var options = ParseArguments(args);
+
+            if (!ValidatePaths(options.Source, options.Target, options.LogToFile, options.Verbose)) return;
+
+            if (options.Exclude && !ValidateExcludePaths(options.ExcludePaths, options.LogToFile, options.Verbose)) return;
+
+            if (Directory.Exists(options.Source) && Directory.Exists(options.Target))
+            {
+                Utility.SynchronizeDirectories(
+                    options.Source, 
+                    options.Target, 
+                    options.Verbose, 
+                    options.LogToFile, 
+                    options.Exclude, 
+                    options.ExcludePaths, 
+                    options.Ftp, 
+                    options.PreservePermissionsAndTimestamps, 
+                    null, 
+                    null
+                );
+
+                LogMessage("Synchronization completed.", "Success", options.LogToFile, options.Verbose, ConsoleColor.Green);
+            }
+            else
+            {
+                LogMessage("One or both paths do not exist.", "Error", options.LogToFile, options.Verbose, ConsoleColor.Red);
+            }
+        }
+
+        private static (bool Verbose, bool LogToFile, bool Exclude, bool Ftp, bool PreservePermissionsAndTimestamps, string Source, string Target, List<string> ExcludePaths) ParseArguments(string[] args)
+        {
+            bool verbose = false, logToFile = false, exclude = false, ftp = false, preservePermissionsAndTimestamps = false;
+            string source = string.Empty, target = string.Empty;
+            var excludePaths = new List<string>();
 
             foreach (var arg in args)
             {
@@ -39,99 +66,56 @@ namespace SyncData
                         preservePermissionsAndTimestamps = true;
                         break;
                     default:
-                        if (arg.StartsWith("-source="))
-                        {
-                            source = arg.Substring(8);
-                        }
-                        else if (arg.StartsWith("-target="))
-                        {
-                            target = arg.Substring(8);
-                        }
+                        if (arg.StartsWith("-source=")) source = arg.Substring(8);
+                        else if (arg.StartsWith("-target=")) target = arg.Substring(8);
                         break;
                 }
             }
 
+            return (verbose, logToFile, exclude, ftp, preservePermissionsAndTimestamps, source, target, excludePaths);
+        }
+
+        private static bool ValidatePaths(string source, string target, bool logToFile, bool verbose)
+        {
             if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("You must provide two directory paths as arguments.");
-
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "You must provide two directory paths as arguments.", verbose,
-                            logToFile);
-                    }
-                    return;
-                }
-
-                if (exclude)
-                {
-                    if (excludePaths.Count == 0)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("-exclude: You must provide at least one exclude path as an argument.");
-
-                        if (logToFile)
-                        {
-                            Utility.LogMessage("Error", "-exclude: You must provide at least one exclude path as an argument.", verbose,
-                                logToFile);    
-                        }
-                        
-                        
-                        return;
-                    }
-                }
-            
+            {
+                LogMessage("You must provide two directory paths as arguments.", "Error", logToFile, verbose, ConsoleColor.Red);
+                return false;
+            }
 
             if (string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("The second path cannot be the same as the first.");
-                        Console.ResetColor();
-                    }
+            {
+                LogMessage("The second path cannot be the same as the first.", "Error", logToFile, verbose, ConsoleColor.Red);
+                return false;
+            }
 
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "The second path cannot be the same as the first.", verbose, logToFile);
-                            
-                    }
-                    return;
-                    
-                }
+            return true;
+        }
 
-                if (Directory.Exists(source) && Directory.Exists(target))
-                {
-                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp, preservePermissionsAndTimestamps, null, null);
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Synchronization completed.");
-                        Console.ResetColor();
-                    }
+        private static bool ValidateExcludePaths(List<string> excludePaths, bool logToFile, bool verbose)
+        {
+            if (excludePaths.Count == 0)
+            {
+                LogMessage("-exclude: You must provide at least one exclude path as an argument.", "Error", logToFile, verbose, ConsoleColor.Red);
+                return false;
+            }
 
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Success", "Synchronization completed.", verbose, logToFile);    
-                    }
-                    
-                }
-                else
-                {
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("One or both paths do not exist.");
-                        Console.ResetColor();
-                    }
+            return true;
+        }
 
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "One or both paths do not exist.", verbose, logToFile);    
-                    }
-                    
-                }
+        private static void LogMessage(string message, string logType, bool logToFile, bool verbose, ConsoleColor color)
+        {
+            if (verbose)
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(message);
+                Console.ResetColor();
+            }
+
+            if (logToFile)
+            {
+                Utility.LogMessage(logType, message, verbose, logToFile);
             }
         }
     }
+}

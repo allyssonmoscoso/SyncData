@@ -17,11 +17,11 @@ namespace SyncData
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(ftpServerUrl);
-                    var byteArray = new NetworkCredential(username, password).GetCredential(client.BaseAddress, "Basic").Password;
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes($"{username}:{byteArray}")));
+                    var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{username}:{password}"));
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
 
                     byte[] fileContents = await File.ReadAllBytesAsync(filePath);
-                    var content = new ByteArrayContent(fileContents);
+                    using var content = new ByteArrayContent(fileContents);
                     var response = await client.PutAsync(fileName, content);
 
                     return response.IsSuccessStatusCode;
@@ -38,203 +38,129 @@ namespace SyncData
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
 
-            var filesToCopy = sourceDirectory.GetFiles().Length + targetDirectory.GetFiles().Length;
-            var directoriesToCreate = sourceDirectory.GetDirectories().Length + targetDirectory.GetDirectories().Length;
-            var totalOperations = filesToCopy + directoriesToCreate;
+            var sourceFiles = sourceDirectory.GetFiles();
+            var targetFiles = targetDirectory.GetFiles();
+            var sourceDirectories = sourceDirectory.GetDirectories();
+            var targetDirectories = targetDirectory.GetDirectories();
+
+            var totalOperations = sourceFiles.Length + targetFiles.Length + sourceDirectories.Length + targetDirectories.Length;
 
             using var progressBar = new ProgressBar();
+            int progress = 0;
+
+            void ReportProgress() => progressBar.Report((double)progress / totalOperations);
+
+            async Task SynchronizeFile(FileInfo file, string destinationPath, bool isSourceToTarget)
             {
-                int progress = 0;
-
-                // Synchronize files from source directory to target directory
-                foreach (var file in sourceDirectory.GetFiles())
+                if (excludePaths.Any(e => file.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (excludePaths.Any(e => file.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
+                    if (verbose)
                     {
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.WriteLine("Excluding file: " + file.FullName);
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
-                        }
-
-                        continue;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine($"Excluding file: {file.FullName}");
+                        Console.ResetColor();
                     }
 
-                    var targetFilePath = Path.Combine(targetDir, file.Name);
-                    if (!File.Exists(targetFilePath) || file.LastWriteTime > File.GetLastWriteTime(targetFilePath))
+                    if (logToFile)
                     {
-                        var startTime = DateTime.Now;
-                        file.CopyTo(targetFilePath, true);
-                        if (preservePermissionsAndTimestamps)
-                        {
-                            File.SetAttributes(targetFilePath, file.Attributes);
-                            File.SetLastWriteTime(targetFilePath, file.LastWriteTime);
-                        }
-                        var endTime = DateTime.Now;
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"File synchronized: {file.FullName} -> {targetFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
-                        }
-
-                        if (useFtp)
-                        {
-                            await UploadFileToFtp(file.Name, targetFilePath, "ftpServerUrl", userFtp, passwordFtp);
-                        }
+                        LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
                     }
-
-                    progress++;
-                    progressBar.Report((double)progress / totalOperations);
+                    return;
                 }
 
-                // Synchronize files from target directory to source directory
-                foreach (var file in targetDirectory.GetFiles())
+                if (!File.Exists(destinationPath) || file.LastWriteTime > File.GetLastWriteTime(destinationPath))
                 {
-                    if (excludePaths.Any(e => file.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
+                    var startTime = DateTime.Now;
+                    file.CopyTo(destinationPath, true);
+                    if (preservePermissionsAndTimestamps)
                     {
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.WriteLine("Excluding file: " + file.FullName);
-                            Console.ResetColor();
-                        }
+                        File.SetAttributes(destinationPath, file.Attributes);
+                        File.SetLastWriteTime(destinationPath, file.LastWriteTime);
+                    }
+                    var endTime = DateTime.Now;
 
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Excluding file: {file.FullName}", verbose, logToFile);
-                        }
-                        continue;
+                    if (verbose)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"File synchronized: {file.FullName} -> {destinationPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                        Console.ResetColor();
                     }
 
-                    var sourceFilePath = Path.Combine(sourceDir, file.Name);
-                    if (!File.Exists(sourceFilePath) || file.LastWriteTime > File.GetLastWriteTime(sourceFilePath))
+                    if (logToFile)
                     {
-                        var startTime = DateTime.Now;
-                        file.CopyTo(sourceFilePath, true);
-                        if (preservePermissionsAndTimestamps)
-                        {
-                            File.SetAttributes(sourceFilePath, file.Attributes);
-                            File.SetLastWriteTime(sourceFilePath, file.LastWriteTime);
-                        }
-                        var endTime = DateTime.Now;
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"File synchronized: {file.FullName} -> {sourceFilePath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
-                        }
-
-                        if (useFtp)
-                        {
-                            await UploadFileToFtp(file.Name, sourceFilePath, "ftpServerUrl", userFtp, passwordFtp);
-                        }
+                        LogMessage("Success", $"File synchronized: {file.FullName} -> {destinationPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
 
-                    progress++;
-                    progressBar.Report((double)progress / totalOperations);
+                    if (useFtp)
+                    {
+                        await UploadFileToFtp(file.Name, destinationPath, "ftpServerUrl", userFtp, passwordFtp);
+                    }
                 }
 
-                // Synchronize subdirectories
-                foreach (var directory in sourceDirectory.GetDirectories())
+                progress++;
+                ReportProgress();
+            }
+
+            async Task SynchronizeDirectory(DirectoryInfo directory, string destinationPath, bool isSourceToTarget)
+            {
+                if (excludePaths.Any(e => directory.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (excludePaths.Any(e => directory.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
+                    if (verbose)
                     {
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.WriteLine("Excluding directory: " + directory.FullName);
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
-                        }
-                        continue;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine($"Excluding directory: {directory.FullName}");
+                        Console.ResetColor();
                     }
 
-                    var targetSubDirPath = Path.Combine(targetDir, directory.Name);
-                    if (!Directory.Exists(targetSubDirPath))
+                    if (logToFile)
                     {
-                        var startTime = DateTime.Now;
-                        Directory.CreateDirectory(targetSubDirPath);
-                        var endTime = DateTime.Now;
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Directory created: {targetSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
-                        }
+                        LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
                     }
-
-                    await SynchronizeDirectories(directory.FullName, targetSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, preservePermissionsAndTimestamps, userFtp, passwordFtp);
-                    progress++;
-                    progressBar.Report((double)progress / totalOperations);
+                    return;
                 }
 
-                foreach (var directory in targetDirectory.GetDirectories())
+                if (!Directory.Exists(destinationPath))
                 {
-                    if (excludePaths.Any(e => directory.FullName.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.WriteLine("Excluding directory: " + directory.FullName);
-                            Console.ResetColor();
-                        }
+                    var startTime = DateTime.Now;
+                    Directory.CreateDirectory(destinationPath);
+                    var endTime = DateTime.Now;
 
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Excluding directory: {directory.FullName}", verbose, logToFile);
-                        }
-                        continue;
+                    if (verbose)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"Directory created: {destinationPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+                        Console.ResetColor();
                     }
 
-                    var sourceSubDirPath = Path.Combine(sourceDir, directory.Name);
-                    if (!Directory.Exists(sourceSubDirPath))
+                    if (logToFile)
                     {
-                        var startTime = DateTime.Now;
-                        Directory.CreateDirectory(sourceSubDirPath);
-                        var endTime = DateTime.Now;
-                        if (verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
-                            Console.ResetColor();
-                        }
-
-                        if (logToFile)
-                        {
-                            LogMessage("Success", $"Directory created: {sourceSubDirPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
-                        }
+                        LogMessage("Success", $"Directory created: {destinationPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)", verbose, logToFile);
                     }
-
-                    await SynchronizeDirectories(directory.FullName, sourceSubDirPath, verbose, logToFile, exclude, excludePaths, useFtp, preservePermissionsAndTimestamps, userFtp, passwordFtp);
-                    progress++;
-                    progressBar.Report(1.0);
                 }
+
+                await SynchronizeDirectories(directory.FullName, destinationPath, verbose, logToFile, exclude, excludePaths, useFtp, preservePermissionsAndTimestamps, userFtp, passwordFtp);
+                progress++;
+                ReportProgress();
+            }
+
+            foreach (var file in sourceFiles)
+            {
+                await SynchronizeFile(file, Path.Combine(targetDir, file.Name), true);
+            }
+
+            foreach (var file in targetFiles)
+            {
+                await SynchronizeFile(file, Path.Combine(sourceDir, file.Name), false);
+            }
+
+            foreach (var directory in sourceDirectories)
+            {
+                await SynchronizeDirectory(directory, Path.Combine(targetDir, directory.Name), true);
+            }
+
+            foreach (var directory in targetDirectories)
+            {
+                await SynchronizeDirectory(directory, Path.Combine(sourceDir, directory.Name), false);
             }
         }
 

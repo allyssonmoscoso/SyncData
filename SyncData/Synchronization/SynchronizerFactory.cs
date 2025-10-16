@@ -10,10 +10,27 @@ namespace SyncData.Synchronization
     /// </summary>
     public class SynchronizerFactory
     {
-        public FileSynchronizer CreateSynchronizer(SyncConfiguration config, Logger logger, IProgress<double>? progressReporter = null)
+        /// <summary>
+        /// Creates a file synchronizer based on the configuration
+        /// Currently supports bidirectional synchronization, but can be extended
+        /// to support other types (e.g., unidirectional, FTP-based, etc.)
+        /// </summary>
+        public FileSynchronizer CreateSynchronizer(
+            SyncConfiguration config, 
+            Logger logger, 
+            IProgress<double>? progressReporter = null)
         {
-            // Currently only one type, but this pattern allows easy extension
-            // For example: UnidirectionalSynchronizer, FtpSynchronizer, etc.
+            // Factory pattern allows easy extension for different synchronizer types
+            // Future implementations could check config.SyncType or other flags
+            // to determine which synchronizer to create
+            
+            if (config.UseFtp)
+            {
+                // Future: return new FtpSynchronizer(config, logger, progressReporter);
+                throw new NotImplementedException("FTP synchronization not yet implemented");
+            }
+
+            // Default to bidirectional synchronizer
             return new BidirectionalSynchronizer(config, logger, progressReporter);
         }
     }

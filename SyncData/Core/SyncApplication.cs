@@ -15,12 +15,14 @@ namespace SyncData.Core
         private readonly SyncConfiguration _config;
         private readonly Logger _logger;
         private readonly ConfigurationValidator _validator;
+        private readonly SynchronizerFactory _synchronizerFactory;
 
         public SyncApplication(SyncConfiguration config, Logger logger)
         {
             _config = config;
             _logger = logger;
             _validator = new ConfigurationValidator(logger);
+            _synchronizerFactory = new SynchronizerFactory();
         }
 
         public async Task<bool> RunAsync()
@@ -33,7 +35,7 @@ namespace SyncData.Core
             try
             {
                 using var progressBar = new ProgressBar();
-                var synchronizer = CreateSynchronizer(progressBar);
+                var synchronizer = _synchronizerFactory.CreateSynchronizer(_config, _logger, progressBar);
                 
                 await synchronizer.SynchronizeAsync();
                 
@@ -45,11 +47,6 @@ namespace SyncData.Core
                 _logger.LogError($"Synchronization failed: {ex.Message}");
                 return false;
             }
-        }
-
-        private FileSynchronizer CreateSynchronizer(IProgress<double> progressReporter)
-        {
-            return new BidirectionalSynchronizer(_config, _logger, progressReporter);
         }
     }
 }

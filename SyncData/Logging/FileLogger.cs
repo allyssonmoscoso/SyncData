@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using SyncData.Configuration;
 
 namespace SyncData.Logging
 {
@@ -10,9 +11,9 @@ namespace SyncData.Logging
     {
         private readonly string _logFilePath;
 
-        public FileLogger(string logFilePath = "syncData.log")
+        public FileLogger(string? logFilePath = null)
         {
-            _logFilePath = logFilePath;
+            _logFilePath = logFilePath ?? AppConstants.DefaultLogFileName;
         }
 
         public override void Log(string status, string message)

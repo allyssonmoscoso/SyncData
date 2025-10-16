@@ -7,7 +7,7 @@ namespace SyncData.Synchronization
     /// <summary>
     /// Abstract base class for file operations
     /// </summary>
-    public abstract class FileOperation
+    public abstract class FileOperation : IFileOperation
     {
         public string SourcePath { get; protected set; } = string.Empty;
         public string TargetPath { get; protected set; } = string.Empty;

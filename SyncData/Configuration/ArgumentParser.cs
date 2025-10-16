@@ -16,37 +16,37 @@ namespace SyncData.Configuration
             {
                 switch (arg)
                 {
-                    case "-v":
-                    case "-verbose":
+                    case AppConstants.VerboseFlag:
+                    case AppConstants.VerboseFlagLong:
                         config.Verbose = true;
                         break;
-                    case "-log-file":
+                    case AppConstants.LogFileFlag:
                         config.LogToFile = true;
                         break;
-                    case var excludeArg when excludeArg.StartsWith("-exclude="):
+                    case var excludeArg when excludeArg.StartsWith(AppConstants.ExcludeArgPrefix):
                         config.Exclude = true;
                         config.ExcludePaths.AddRange(
-                            excludeArg.Substring(9)
+                            excludeArg.Substring(AppConstants.ExcludeArgPrefix.Length)
                                 .Trim('{', '}')
                                 .Split(',')
                                 .Select(p => p.Trim())
                                 .Where(p => !string.IsNullOrWhiteSpace(p))
                         );
                         break;
-                    case "-ftp":
+                    case AppConstants.FtpFlag:
                         config.UseFtp = true;
                         break;
-                    case "-preserve":
+                    case AppConstants.PreserveFlag:
                         config.PreservePermissionsAndTimestamps = true;
                         break;
                     default:
-                        if (arg.StartsWith("-source="))
+                        if (arg.StartsWith(AppConstants.SourceArgPrefix))
                         {
-                            config.SourcePath = arg.Substring(8);
+                            config.SourcePath = arg.Substring(AppConstants.SourceArgPrefix.Length);
                         }
-                        else if (arg.StartsWith("-target="))
+                        else if (arg.StartsWith(AppConstants.TargetArgPrefix))
                         {
-                            config.TargetPath = arg.Substring(8);
+                            config.TargetPath = arg.Substring(AppConstants.TargetArgPrefix.Length);
                         }
                         break;
                 }

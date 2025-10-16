@@ -35,7 +35,7 @@ namespace SyncData
             UpdateText(text);
         }
 
-        private void TimerHandler(object state)
+        private void TimerHandler(object? state)
         {
             lock (timer)
             {

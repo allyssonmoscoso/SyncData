@@ -1,137 +1,40 @@
-﻿using System;
-using System.IO;
+﻿using System.Threading.Tasks;
+using SyncData.Configuration;
+using SyncData.Core;
+using SyncData.Logging;
 
 namespace SyncData
 {
-
     class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            bool verbose = false;
-            bool logToFile = false;
-            bool exclude = false;
-            bool ftp = false;
-            bool preservePermissionsAndTimestamps = false;
-            string source = string.Empty;
-            string target = string.Empty;
-            List<string> excludePaths = new List<string>();
+            // Parse command-line arguments
+            var parser = new ArgumentParser();
+            var config = parser.Parse(args);
 
-            foreach (var arg in args)
-            {
-                switch (arg)
-                {
-                    case "-v":
-                    case "-verbose":
-                        verbose = true;
-                        break;
-                    case "-log-file":
-                        logToFile = true;
-                        break;
-                    case var excludeArg when excludeArg.StartsWith("-exclude="):
-                        exclude = true;
-                        excludePaths.AddRange(excludeArg.Substring(9).Trim('{', '}').Split(',').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p)));
-                        break;
-                    case "-ftp":
-                        ftp = true;
-                        break;
-                    case "-preserve":
-                        preservePermissionsAndTimestamps = true;
-                        break;
-                    default:
-                        if (arg.StartsWith("-source="))
-                        {
-                            source = arg.Substring(8);
-                        }
-                        else if (arg.StartsWith("-target="))
-                        {
-                            target = arg.Substring(8);
-                        }
-                        break;
-                }
-            }
+            // Create logger based on configuration
+            var logger = CreateLogger(config);
 
-            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("You must provide two directory paths as arguments.");
+            // Create and run the application
+            var app = new SyncApplication(config, logger);
+            await app.RunAsync();
+        }
 
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "You must provide two directory paths as arguments.", verbose,
-                            logToFile);
-                    }
-                    return;
-                }
-
-                if (exclude)
-                {
-                    if (excludePaths.Count == 0)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("-exclude: You must provide at least one exclude path as an argument.");
-
-                        if (logToFile)
-                        {
-                            Utility.LogMessage("Error", "-exclude: You must provide at least one exclude path as an argument.", verbose,
-                                logToFile);    
-                        }
-                        
-                        
-                        return;
-                    }
-                }
+        private static Logger CreateLogger(SyncConfiguration config)
+        {
+            var compositeLogger = new CompositeLogger();
             
-
-            if (string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("The second path cannot be the same as the first.");
-                        Console.ResetColor();
-                    }
-
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "The second path cannot be the same as the first.", verbose, logToFile);
-                            
-                    }
-                    return;
-                    
-                }
-
-                if (Directory.Exists(source) && Directory.Exists(target))
-                {
-                    Utility.SynchronizeDirectories(source, target, verbose, logToFile, exclude, excludePaths, ftp, preservePermissionsAndTimestamps, null, null);
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Synchronization completed.");
-                        Console.ResetColor();
-                    }
-
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Success", "Synchronization completed.", verbose, logToFile);    
-                    }
-                    
-                }
-                else
-                {
-                    if (verbose)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("One or both paths do not exist.");
-                        Console.ResetColor();
-                    }
-
-                    if (logToFile)
-                    {
-                        Utility.LogMessage("Error", "One or both paths do not exist.", verbose, logToFile);    
-                    }
-                    
-                }
+            // Always add console logger
+            compositeLogger.AddLogger(new ConsoleLogger(config.Verbose));
+            
+            // Add file logger if requested
+            if (config.LogToFile)
+            {
+                compositeLogger.AddLogger(new FileLogger());
             }
+            
+            return compositeLogger;
         }
     }
+}

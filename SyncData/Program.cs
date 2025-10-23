@@ -1,14 +1,46 @@
+<<<<<<< HEAD
+﻿using System.Threading.Tasks;
+using SyncData.Configuration;
+using SyncData.Core;
+using SyncData.Logging;
+=======
 ﻿using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+>>>>>>> 22f4bc6a82bbabbd9eb97fca4fab5fa39c359557
 
 namespace SyncData
 {
     class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
+<<<<<<< HEAD
+            // Parse command-line arguments
+            var parser = new ArgumentParser();
+            var config = parser.Parse(args);
+
+            // Create logger based on configuration
+            var logger = CreateLogger(config);
+
+            // Create and run the application
+            var app = new SyncApplication(config, logger);
+            await app.RunAsync();
+        }
+
+        private static Logger CreateLogger(SyncConfiguration config)
+        {
+            var compositeLogger = new CompositeLogger();
+            
+            // Always add console logger
+            compositeLogger.AddLogger(new ConsoleLogger(config.Verbose));
+            
+            // Add file logger if requested
+            if (config.LogToFile)
+            {
+                compositeLogger.AddLogger(new FileLogger());
+=======
             var options = ParseArguments(args);
 
             if (!ValidatePaths(options.Source, options.Target, options.LogToFile, options.Verbose)) return;
@@ -115,7 +147,10 @@ namespace SyncData
             if (logToFile)
             {
                 Utility.LogMessage(logType, message, verbose, logToFile);
+>>>>>>> 22f4bc6a82bbabbd9eb97fca4fab5fa39c359557
             }
+            
+            return compositeLogger;
         }
     }
 }

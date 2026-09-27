@@ -24,34 +24,51 @@ This document describes the object-oriented architecture improvements made to th
 
 ## Architecture
 
-### Namespace Structure
+### Project / Namespace Structure
 
 ```
-SyncData/
-├── Configuration/          # Configuration and argument parsing
-│   ├── AppConstants.cs    # Application-wide constants
-│   ├── ArgumentParser.cs  # Command-line argument parsing
-│   └── SyncConfiguration.cs # Configuration data model
-├── Core/                   # Application orchestration
-│   └── SyncApplication.cs # Main application coordinator
-├── Logging/               # Logging abstraction
-│   ├── Logger.cs          # Abstract logger base class
-│   ├── ConsoleLogger.cs   # Console logging implementation
-│   ├── FileLogger.cs      # File logging implementation
-│   └── CompositeLogger.cs # Composite logger for multiple outputs
-├── Synchronization/       # File synchronization logic
-│   ├── IFileOperation.cs  # File operation interface
-│   ├── FileOperation.cs   # Abstract base for file operations
-│   ├── FileCopyOperation.cs # File copy implementation
+SyncData.Core/                 # Shared library (UI-agnostic)
+├── Configuration/             # Configuration and argument parsing
+│   ├── AppConstants.cs        # Application-wide constants
+│   ├── ArgumentParser.cs      # Command-line argument parsing
+│   └── SyncConfiguration.cs   # Configuration data model
+├── Core/                      # Application orchestration
+│   └── SyncApplication.cs     # Main application coordinator
+├── Logging/                   # Logging abstraction
+│   ├── Logger.cs              # Abstract logger base class
+│   ├── ConsoleLogger.cs       # Console logging implementation
+│   ├── FileLogger.cs          # File logging implementation
+│   └── CompositeLogger.cs     # Composite logger for multiple outputs
+├── Synchronization/           # File synchronization logic
+│   ├── IFileOperation.cs      # File operation interface
+│   ├── FileOperation.cs       # Abstract base for file operations
+│   ├── FileCopyOperation.cs   # File copy implementation
 │   ├── DirectoryCreateOperation.cs # Directory creation implementation
-│   ├── FileSynchronizer.cs # Abstract synchronizer base class
+│   ├── FileSynchronizer.cs    # Abstract synchronizer base class
 │   ├── BidirectionalSynchronizer.cs # Bidirectional sync implementation
 │   └── SynchronizerFactory.cs # Factory for creating synchronizers
-├── Validation/            # Configuration validation
-│   └── ConfigurationValidator.cs # Validates configuration
-├── ProgressBar.cs         # Progress reporting
-└── Program.cs            # Application entry point
+├── Validation/                # Configuration validation
+│   └── ConfigurationValidator.cs
+└── Localization/              # Core strings (Strings.resx/.es.resx) + CoreLocalizer
+
+SyncData.Cli/                  # Console front-end
+├── Program.cs                 # Entry point (creates ProgressBar + SyncApplication)
+└── ProgressBar.cs             # Console progress reporting
+
+SyncData.Gui/                  # Avalonia desktop front-end (Linux/Windows/macOS)
+├── App.axaml(.cs)
+├── Program.cs
+├── Views/                     # MainWindow.axaml(.cs)
+├── ViewModels/                # MainWindowViewModel, UpdateViewModel (MVVM)
+├── Localization/              # GUI strings (resx) + Localizer
+└── Services/                  # UiLogger, UiProgress, IUpdateService, VelopackUpdateService, SettingsService
+
+SyncData.Tests/                # xUnit tests for SyncData.Core
 ```
+
+The Core library is UI-agnostic: it only depends on abstractions
+(`Logger`, `IProgress<double>`, `CancellationToken`), so both the CLI and the
+GUI can reuse exactly the same synchronization logic.
 
 ## SOLID Principles Applied
 
@@ -110,8 +127,9 @@ SyncData/
 - **SynchronizerFactory**: Creates appropriate synchronizer instances
 
 ### Application Layer
-- **SyncApplication**: Orchestrates the entire synchronization process
-- **Program**: Entry point, creates dependencies and runs application
+- **SyncApplication**: Orchestrates the entire synchronization process (accepts an optional `IProgress<double>` and a `CancellationToken`)
+- **Program (SyncData.Cli)**: Console entry point; creates the dependencies (`CompositeLogger`, `ProgressBar`) and runs the application
+- **SyncData.Gui**: Avalonia front-end that reuses `SyncApplication` with a UI logger (`UiLogger`) and UI progress (`UiProgress`)
 
 ## Benefits of the New Architecture
 

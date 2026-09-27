@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_Title" xml:space="preserve"><value>SyncData</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>New version available: {0}</value></data>
+  <data name="Action_Update" xml:space="preserve"><value>Update</value></data>
+  <data name="Action_Dismiss" xml:space="preserve"><value>Dismiss</value></data>
+  <data name="Label_Source" xml:space="preserve"><value>Source:</value></data>
+  <data name="Watermark_Source" xml:space="preserve"><value>/path/to/source</value></data>
+  <data name="Action_Choose" xml:space="preserve"><value>Browse…</value></data>
+  <data name="Label_Target" xml:space="preserve"><value>Target:</value></data>
+  <data name="Watermark_Target" xml:space="preserve"><value>/path/to/target</value></data>
+  <data name="Option_Verbose" xml:space="preserve"><value>Verbose</value></data>
+  <data name="Option_Preserve" xml:space="preserve"><value>Preserve permissions/timestamps</value></data>
+  <data name="Option_LogToFile" xml:space="preserve"><value>Log to file</value></data>
+  <data name="Label_Exclude" xml:space="preserve"><value>Exclude:</value></data>
+  <data name="Watermark_Exclude" xml:space="preserve"><value>a.txt, folder, ... (comma separated)</value></data>
+  <data name="Action_Sync" xml:space="preserve"><value>Synchronize</value></data>
+  <data name="Action_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Action_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Label_Language" xml:space="preserve"><value>Language:</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Ready to synchronize.</value></data>
+  <data name="Status_Syncing" xml:space="preserve"><value>Synchronizing...</value></data>
+  <data name="Status_Completed" xml:space="preserve"><value>Synchronization completed.</value></data>
+  <data name="Status_NotCompleted" xml:space="preserve"><value>Synchronization finished without completing.</value></data>
+  <data name="Status_Cancelled" xml:space="preserve"><value>Synchronization cancelled.</value></data>
+  <data name="Status_Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Update_NotInstalled" xml:space="preserve"><value>Updates are only available in the installed build.</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>Checking for updates...</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>You already have the latest version.</value></data>
+  <data name="Update_CheckFailed" xml:space="preserve"><value>Could not check for updates: {0}</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>Downloading update...</value></data>
+  <data name="Update_Applying" xml:space="preserve"><value>Applying update and restarting...</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>Could not update: {0}</value></data>
+</root>

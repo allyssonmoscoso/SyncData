@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RollForward>Major</RollForward>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SyncData.Core\SyncData.Core.csproj" />
+        <ProjectReference Include="..\SyncData.Gui\SyncData.Gui.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Copy the .resx files so resource parity tests can validate them. -->
+        <None Include="..\SyncData.Core\Localization\Strings*.resx" Link="resx/core/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\SyncData.Gui\Localization\Strings*.resx" Link="resx/gui/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+</Project>

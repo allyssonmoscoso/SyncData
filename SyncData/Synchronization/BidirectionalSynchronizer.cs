@@ -22,6 +22,13 @@ namespace SyncData.Synchronization
 
         public override async Task SynchronizeAsync()
         {
+            // Ensure the target directory exists before enumerating it
+            if (!Directory.Exists(Config.TargetPath))
+            {
+                Directory.CreateDirectory(Config.TargetPath);
+                Logger.LogInfo($"Directory created: {Config.TargetPath}");
+            }
+
             await SynchronizeDirectoriesAsync(Config.SourcePath, Config.TargetPath);
         }
 

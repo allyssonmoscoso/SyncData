@@ -38,6 +38,15 @@ namespace SyncData
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
 
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+                if (logToFile)
+                {
+                    LogMessage("Success", $"Directory created: {targetDir}", verbose, logToFile);
+                }
+            }
+
             var sourceFiles = sourceDirectory.GetFiles();
             var targetFiles = targetDirectory.GetFiles();
             var sourceDirectories = sourceDirectory.GetDirectories();

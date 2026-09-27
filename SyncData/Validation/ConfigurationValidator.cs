@@ -36,9 +36,9 @@ namespace SyncData.Validation
                 return false;
             }
 
-            if (!Directory.Exists(config.SourcePath) || !Directory.Exists(config.TargetPath))
+            if (!Directory.Exists(config.SourcePath))
             {
-                _logger.LogError("One or both paths do not exist.");
+                _logger.LogError("The source path does not exist.");
                 return false;
             }
 

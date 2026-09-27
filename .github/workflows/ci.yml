@@ -39,3 +39,6 @@ jobs:
 
       - name: Test
         run: dotnet test SyncData.sln -c Release --no-build
+
+      - name: Check i18n keys
+        run: python3 build/check-i18n.py

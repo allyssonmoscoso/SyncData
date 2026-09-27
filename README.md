@@ -58,6 +58,18 @@ selector in the window footer; the change applies instantly and is saved to
 Messages are also localized inside the core library (validation and log output),
 so the log panel follows the selected language too.
 
+### Adding a new string
+
+- Add the key to **both** `Strings.resx` (English) and `Strings.es.resx` of the
+  relevant project, with the **same `{0}`/`{1}` placeholders**.
+- Use the naming prefixes: `App_`, `Status_`, `Action_`, `Option_`, `Label_`,
+  `Watermark_`, `Update_`, `Validator_`, `Log_`, `Sync_`, `Ftp_`.
+- Guardrails run automatically:
+  - `ResourceParityTests` (via `dotnet test`) checks key/placeholder parity,
+    empty values and duplicate keys for every `Strings.*.resx`.
+  - `python3 build/check-i18n.py` (also run in CI) fails if code/XAML references a
+    missing key, and warns about keys that are defined but unused.
+
 ## Usage
 
 ### Graphical interface (Avalonia)

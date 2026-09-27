@@ -22,4 +22,10 @@
         <ProjectReference Include="..\SyncData.Gui\SyncData.Gui.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Copy the .resx files so resource parity tests can validate them. -->
+        <None Include="..\SyncData.Core\Localization\Strings*.resx" Link="resx/core/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\SyncData.Gui\Localization\Strings*.resx" Link="resx/gui/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>

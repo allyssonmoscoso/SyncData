@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=SyncData
+GenericName=Directory Synchronizer
+Comment=Bidirectional directory synchronization
+Exec=/opt/syncdata/SyncData.Gui
+Icon=syncdata
+Terminal=false
+Categories=Utility;FileTools;
+Keywords=sync;backup;files;directory;

@@ -7,7 +7,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RollForward>Major</RollForward>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <PackId>SyncData</PackId>
+        <PackTitle>SyncData</PackTitle>
     </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.22" />
@@ -16,6 +24,7 @@
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.22" Condition="'$(Configuration)' == 'Debug'" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Velopack" Version="1.0.1" />
     </ItemGroup>
 
     <ItemGroup>

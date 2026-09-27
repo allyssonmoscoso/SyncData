@@ -73,6 +73,36 @@ Replace `<source_directory>` and `<target_directory>` with the paths of the dire
 dotnet test SyncData.sln
 ```
 
+## Distribution / packaging
+
+Requirements: `dotnet tool install -g vpk` (Velopack CLI) and, on Linux, `dpkg-deb`.
+
+```sh
+# 1) Publish a self-contained single-file build and create the portable archive
+./build/publish.sh linux-x64 1.0.0      # or win-x64, osx-arm64, osx-x64, linux-arm64
+
+# 2) Native installer with Velopack (run on the target OS)
+./build/pack.sh linux-x64 1.0.0         # Linux: AppImage · Windows: Setup.exe · macOS: .dmg
+
+# 3) (Linux) .deb package
+./build/linux/build-deb.sh 1.0.0
+
+# macOS: build the icon and the .app / .dmg bundle
+./build/macos/make-icns.sh
+./build/macos/build-app.sh osx-arm64 1.0.0
+./build/macos/build-dmg.sh 1.0.0
+```
+
+On Windows use `build/publish.ps1` and `build/pack.ps1`.
+
+Artifacts are written to `artifacts/` (git-ignored):
+- `artifacts/packages/portable/` — `.zip` (Windows) / `.tar.gz` (Linux/macOS)
+- `artifacts/packages/<rid>/` — Velopack output (AppImage / Setup.exe / .dmg + update feed)
+- `artifacts/packages/deb/` — Linux `.deb`
+
+> Note: Windows `Setup.exe` and macOS `.dmg` must be built on their own OS (run the
+> scripts there). Code signing and Apple notarization are out of scope for now.
+
 ## Example
 
 ```sh

@@ -533,3 +533,8 @@ FodyWeavers.xsd
 
 # SyncData specific ignores
 *.log
+
+# SyncData build output
+artifacts/
+build/macos/icon.icns
+build/macos/AppIcon.iconset/

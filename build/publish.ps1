@@ -24,6 +24,10 @@ dotnet publish (Join-Path $Root "SyncData.Gui/SyncData.Gui.csproj") `
     -p:DebugSymbols=false `
     -o $Out
 
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet publish failed with exit code $LASTEXITCODE"
+}
+
 Write-Host "Published $Rid to $Out"
 
 # Portable archive

@@ -33,6 +33,12 @@ case "$(uname -s)" in
   *)      ICON="$ROOT/SyncData.Gui/Assets/icon.ico" ;;
 esac
 
+if [[ "$RID" == win-* ]]; then
+  MAIN_EXE="SyncData.Gui.exe"
+else
+  MAIN_EXE="SyncData.Gui"
+fi
+
 mkdir -p "$OUT_DIR"
 
 "${VPK[@]}" pack \
@@ -41,7 +47,7 @@ mkdir -p "$OUT_DIR"
   --packVersion "$VERSION" \
   --packAuthors "allyssonmoscoso" \
   --packDir "$PUBLISH_DIR" \
-  --mainExe SyncData.Gui \
+  --mainExe "$MAIN_EXE" \
   --icon "$ICON" \
   --runtime "$RID" \
   --outputDir "$OUT_DIR"

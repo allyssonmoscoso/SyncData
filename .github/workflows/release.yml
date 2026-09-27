@@ -100,8 +100,8 @@ jobs:
           for rid in osx-arm64 osx-x64; do
             ./build/publish.sh "$rid" "$VERSION"
             ./build/pack.sh "$rid" "$VERSION"
-            ./build/macos/build-app.sh "$rid" "$VERSION"
-            ./build/macos/build-dmg.sh "$rid" "$VERSION"
+            # Free disk space before the next architecture
+            rm -rf "artifacts/publish/$rid"
           done
 
       - name: Upload artifacts

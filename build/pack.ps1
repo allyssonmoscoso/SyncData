@@ -33,9 +33,13 @@ if (Get-Command vpk -ErrorAction SilentlyContinue) {
     --packVersion $Version `
     --packAuthors "allyssonmoscoso" `
     --packDir $PublishDir `
-    --mainExe SyncData.Gui `
+    --mainExe "SyncData.Gui.exe" `
     --icon (Join-Path $Root "SyncData.Gui/Assets/icon.ico") `
     --runtime $Rid `
     --outputDir $OutDir
+
+if ($LASTEXITCODE -ne 0) {
+    throw "vpk pack failed with exit code $LASTEXITCODE"
+}
 
 Write-Host "Packaged $Rid into $OutDir"

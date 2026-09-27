@@ -17,8 +17,9 @@ namespace SyncData
             // Create logger based on configuration
             var logger = CreateLogger(config);
 
-            // Create and run the application
-            var app = new SyncApplication(config, logger);
+            // Create the console progress bar and run the application
+            using var progressBar = new ProgressBar();
+            var app = new SyncApplication(config, logger, progressBar);
             var success = await app.RunAsync();
 
             // Propagate the result to the process exit code

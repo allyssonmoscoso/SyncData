@@ -14,13 +14,15 @@ namespace SyncData.Core
     {
         private readonly SyncConfiguration _config;
         private readonly Logger _logger;
+        private readonly IProgress<double>? _progress;
         private readonly ConfigurationValidator _validator;
         private readonly SynchronizerFactory _synchronizerFactory;
 
-        public SyncApplication(SyncConfiguration config, Logger logger)
+        public SyncApplication(SyncConfiguration config, Logger logger, IProgress<double>? progress = null)
         {
             _config = config;
             _logger = logger;
+            _progress = progress;
             _validator = new ConfigurationValidator(logger);
             _synchronizerFactory = new SynchronizerFactory();
         }
@@ -34,11 +36,10 @@ namespace SyncData.Core
 
             try
             {
-                using var progressBar = new ProgressBar();
-                var synchronizer = _synchronizerFactory.CreateSynchronizer(_config, _logger, progressBar);
-                
+                var synchronizer = _synchronizerFactory.CreateSynchronizer(_config, _logger, _progress);
+
                 await synchronizer.SynchronizeAsync();
-                
+
                 _logger.LogSuccess("Synchronization completed.");
                 return true;
             }

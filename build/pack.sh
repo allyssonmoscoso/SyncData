@@ -20,6 +20,13 @@ fi
 
 export PATH="$PATH:$HOME/.dotnet/tools"
 
+# Resolve vpk: prefer a global tool, otherwise use the local tool manifest.
+if command -v vpk >/dev/null 2>&1; then
+  VPK=(vpk)
+else
+  VPK=(dotnet tool run vpk)
+fi
+
 case "$(uname -s)" in
   Linux)  ICON="$ROOT/SyncData.Gui/Assets/icon.png" ;;
   Darwin) ICON="$ROOT/build/macos/icon.icns" ;;
@@ -28,7 +35,7 @@ esac
 
 mkdir -p "$OUT_DIR"
 
-vpk pack \
+"${VPK[@]}" pack \
   --packId SyncData \
   --packTitle SyncData \
   --packVersion "$VERSION" \

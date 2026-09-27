@@ -9,7 +9,7 @@ VERSION="${2:-1.0.0}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PUBLISH_DIR="$ROOT/artifacts/publish/$RID"
-APP="$ROOT/artifacts/app/SyncData.app"
+APP="$ROOT/artifacts/app/$RID/SyncData.app"
 
 if [ ! -d "$PUBLISH_DIR" ]; then
   echo "No publish output at $PUBLISH_DIR. Run: build/publish.sh $RID $VERSION" >&2

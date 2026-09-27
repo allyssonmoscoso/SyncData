@@ -18,7 +18,16 @@ if (-not (Test-Path $PublishDir)) {
 
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
-vpk pack `
+# Resolve vpk: prefer a global tool, otherwise use the local tool manifest.
+if (Get-Command vpk -ErrorAction SilentlyContinue) {
+    $VpkExe = "vpk"
+    $VpkPrefix = @()
+} else {
+    $VpkExe = "dotnet"
+    $VpkPrefix = @("tool", "run", "vpk")
+}
+
+& $VpkExe @VpkPrefix pack `
     --packId SyncData `
     --packTitle SyncData `
     --packVersion $Version `

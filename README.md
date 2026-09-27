@@ -1,6 +1,9 @@
 # SyncData
 
-SyncData is a console application that synchronizes files and directories between two specified paths. It ensures that both directories have the same content by copying files and creating directories as needed.
+[![CI](https://github.com/allyssonmoscoso/SyncData/actions/workflows/ci.yml/badge.svg)](https://github.com/allyssonmoscoso/SyncData/actions/workflows/ci.yml)
+[![Release](https://github.com/allyssonmoscoso/SyncData/actions/workflows/release.yml/badge.svg)](https://github.com/allyssonmoscoso/SyncData/actions/workflows/release.yml)
+
+SyncData is a cross-platform tool (desktop GUI + console) that synchronizes files and directories between two specified paths. It ensures that both directories have the same content by copying files and creating directories as needed.
 
 ## Features
 
@@ -75,7 +78,8 @@ dotnet test SyncData.sln
 
 ## Distribution / packaging
 
-Requirements: `dotnet tool install -g vpk` (Velopack CLI) and, on Linux, `dpkg-deb`.
+Requirements: the .NET 8 SDK, the Velopack CLI (`dotnet tool restore`, pinned in
+`.config/dotnet-tools.json`) and, on Linux, `dpkg-deb`.
 
 ```sh
 # 1) Publish a self-contained single-file build and create the portable archive
@@ -90,7 +94,7 @@ Requirements: `dotnet tool install -g vpk` (Velopack CLI) and, on Linux, `dpkg-d
 # macOS: build the icon and the .app / .dmg bundle
 ./build/macos/make-icns.sh
 ./build/macos/build-app.sh osx-arm64 1.0.0
-./build/macos/build-dmg.sh 1.0.0
+./build/macos/build-dmg.sh osx-arm64 1.0.0
 ```
 
 On Windows use `build/publish.ps1` and `build/pack.ps1`.
@@ -102,6 +106,18 @@ Artifacts are written to `artifacts/` (git-ignored):
 
 > Note: Windows `Setup.exe` and macOS `.dmg` must be built on their own OS (run the
 > scripts there). Code signing and Apple notarization are out of scope for now.
+
+## Continuous Integration
+
+- **CI** (`.github/workflows/ci.yml`): on every push/PR to `main`/`develop` it builds and runs the test suite on Linux.
+- **Release** (`.github/workflows/release.yml`): triggered by a `v*` tag or manually (`workflow_dispatch`). It packages the app on Linux, Windows and macOS with Velopack and publishes a GitHub Release with the artifacts.
+
+To cut a release:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 ## Example
 

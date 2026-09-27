@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SyncData.Synchronization
@@ -7,6 +8,6 @@ namespace SyncData.Synchronization
     /// </summary>
     public interface IFileOperation
     {
-        Task ExecuteAsync();
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
     }
 }

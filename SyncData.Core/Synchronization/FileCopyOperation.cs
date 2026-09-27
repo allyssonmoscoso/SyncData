@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Logging;
 
@@ -20,10 +21,11 @@ namespace SyncData.Synchronization
             _logger = logger;
         }
 
-        public override async Task ExecuteAsync()
+        public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var sourceFile = new FileInfo(SourcePath);
-            var targetFile = new FileInfo(TargetPath);
 
             if (!ShouldCopyFile(sourceFile, TargetPath))
             {
@@ -31,7 +33,7 @@ namespace SyncData.Synchronization
             }
 
             var startTime = DateTime.Now;
-            await Task.Run(() => File.Copy(SourcePath, TargetPath, true));
+            await Task.Run(() => File.Copy(SourcePath, TargetPath, true), cancellationToken);
 
             if (_preserveAttributes)
             {

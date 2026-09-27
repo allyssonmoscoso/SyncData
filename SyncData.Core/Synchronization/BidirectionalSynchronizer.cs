@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
 using SyncData.Logging;
@@ -20,8 +20,10 @@ namespace SyncData.Synchronization
         {
         }
 
-        public override async Task SynchronizeAsync()
+        public override async Task SynchronizeAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             // Ensure the target directory exists before enumerating it
             if (!Directory.Exists(Config.TargetPath))
             {
@@ -29,11 +31,13 @@ namespace SyncData.Synchronization
                 Logger.LogInfo($"Directory created: {Config.TargetPath}");
             }
 
-            await SynchronizeDirectoriesAsync(Config.SourcePath, Config.TargetPath);
+            await SynchronizeDirectoriesAsync(Config.SourcePath, Config.TargetPath, cancellationToken);
         }
 
-        private async Task SynchronizeDirectoriesAsync(string sourceDir, string targetDir)
+        private async Task SynchronizeDirectoriesAsync(string sourceDir, string targetDir, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var sourceDirectory = new DirectoryInfo(sourceDir);
             var targetDirectory = new DirectoryInfo(targetDir);
 
@@ -43,22 +47,24 @@ namespace SyncData.Synchronization
             _progress = 0;
 
             // Synchronize files from source to target
-            await SynchronizeFilesAsync(sourceDirectory, targetDir);
+            await SynchronizeFilesAsync(sourceDirectory, targetDir, cancellationToken);
 
             // Synchronize files from target to source
-            await SynchronizeFilesAsync(targetDirectory, sourceDir);
+            await SynchronizeFilesAsync(targetDirectory, sourceDir, cancellationToken);
 
             // Synchronize subdirectories from source to target
-            await SynchronizeSubdirectoriesAsync(sourceDirectory, targetDir);
+            await SynchronizeSubdirectoriesAsync(sourceDirectory, targetDir, cancellationToken);
 
             // Synchronize subdirectories from target to source
-            await SynchronizeSubdirectoriesAsync(targetDirectory, sourceDir);
+            await SynchronizeSubdirectoriesAsync(targetDirectory, sourceDir, cancellationToken);
         }
 
-        private async Task SynchronizeFilesAsync(DirectoryInfo sourceDirectory, string targetDir)
+        private async Task SynchronizeFilesAsync(DirectoryInfo sourceDirectory, string targetDir, CancellationToken cancellationToken)
         {
             foreach (var file in sourceDirectory.GetFiles())
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (IsExcluded(file.FullName))
                 {
                     LogExcluded("file", file.FullName);
@@ -72,16 +78,18 @@ namespace SyncData.Synchronization
                     Config.PreservePermissionsAndTimestamps, 
                     Logger);
 
-                await copyOperation.ExecuteAsync();
+                await copyOperation.ExecuteAsync(cancellationToken);
 
                 UpdateProgress();
             }
         }
 
-        private async Task SynchronizeSubdirectoriesAsync(DirectoryInfo sourceDirectory, string targetDir)
+        private async Task SynchronizeSubdirectoriesAsync(DirectoryInfo sourceDirectory, string targetDir, CancellationToken cancellationToken)
         {
             foreach (var directory in sourceDirectory.GetDirectories())
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (IsExcluded(directory.FullName))
                 {
                     LogExcluded("directory", directory.FullName);
@@ -90,9 +98,9 @@ namespace SyncData.Synchronization
 
                 var targetSubDirPath = Path.Combine(targetDir, directory.Name);
                 var createDirOperation = new DirectoryCreateOperation(targetSubDirPath, Logger);
-                await createDirOperation.ExecuteAsync();
+                await createDirOperation.ExecuteAsync(cancellationToken);
 
-                await SynchronizeDirectoriesAsync(directory.FullName, targetSubDirPath);
+                await SynchronizeDirectoriesAsync(directory.FullName, targetSubDirPath, cancellationToken);
 
                 UpdateProgress();
             }

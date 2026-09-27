@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SyncData.Synchronization
@@ -18,8 +19,8 @@ namespace SyncData.Synchronization
             TargetPath = targetPath;
         }
 
-        public abstract Task ExecuteAsync();
-        
+        public abstract Task ExecuteAsync(CancellationToken cancellationToken = default);
+
         protected bool ShouldCopyFile(FileInfo sourceFile, string targetFilePath)
         {
             return !File.Exists(targetFilePath) || 

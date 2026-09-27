@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
 using SyncData.Core;
@@ -56,6 +57,25 @@ namespace SyncData.Test
 
             Assert.False(result);
             Assert.True(logger.HasStatus("Error"));
+        }
+
+        [Fact]
+        public async Task RunAsync_WithCancelledToken_ReturnsFalseAndLogsCancellation()
+        {
+            using var source = new TempDirectory();
+            using var target = new TempDirectory();
+            source.CreateFile("a.txt", "x");
+            var config = new SyncConfiguration { SourcePath = source.Path, TargetPath = target.Path };
+            var logger = new FakeLogger();
+            var app = new SyncApplication(config, logger);
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            var result = await app.RunAsync(cts.Token);
+
+            Assert.False(result);
+            Assert.True(logger.Contains("cancelled"));
         }
     }
 }

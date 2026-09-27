@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
 using SyncData.Synchronization;
@@ -193,6 +194,20 @@ namespace SyncData.Test
             await RunSyncAsync(ConfigFor(source.Path, target.Path), logger, new ProgressCollector());
 
             Assert.True(logger.Contains("File synchronized"));
+        }
+
+        [Fact]
+        public async Task SynchronizeAsync_WithCancelledToken_ThrowsOperationCanceled()
+        {
+            using var source = new TempDirectory();
+            using var target = new TempDirectory();
+            source.CreateFile("a.txt", "x");
+
+            var synchronizer = new BidirectionalSynchronizer(ConfigFor(source.Path, target.Path), new FakeLogger());
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => synchronizer.SynchronizeAsync(cts.Token));
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
 using SyncData.Logging;
@@ -27,7 +28,7 @@ namespace SyncData.Core
             _synchronizerFactory = new SynchronizerFactory();
         }
 
-        public async Task<bool> RunAsync()
+        public async Task<bool> RunAsync(CancellationToken cancellationToken = default)
         {
             if (!_validator.Validate(_config))
             {
@@ -38,10 +39,15 @@ namespace SyncData.Core
             {
                 var synchronizer = _synchronizerFactory.CreateSynchronizer(_config, _logger, _progress);
 
-                await synchronizer.SynchronizeAsync();
+                await synchronizer.SynchronizeAsync(cancellationToken);
 
                 _logger.LogSuccess("Synchronization completed.");
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInfo("Synchronization cancelled.");
+                return false;
             }
             catch (Exception ex)
             {

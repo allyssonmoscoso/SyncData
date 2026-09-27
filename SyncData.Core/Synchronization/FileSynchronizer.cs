@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
 using SyncData.Logging;
@@ -24,7 +25,7 @@ namespace SyncData.Synchronization
             ProgressReporter = progressReporter;
         }
 
-        public abstract Task SynchronizeAsync();
+        public abstract Task SynchronizeAsync(CancellationToken cancellationToken = default);
 
         protected bool IsExcluded(string path)
         {

@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SyncData.Gui.ViewModels"
+        x:Class="SyncData.Gui.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="SyncData"
+        Width="760" Height="580"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+
+        <!-- Origen -->
+        <Grid Grid.Row="0" ColumnDefinitions="90,*,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="Origen:" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding SourcePath}" Watermark="/ruta/origen" />
+            <Button Grid.Column="2" Content="Elegir…" Margin="8,0,0,0" Click="OnBrowseSource" />
+        </Grid>
+
+        <!-- Destino -->
+        <Grid Grid.Row="1" ColumnDefinitions="90,*,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="Destino:" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding TargetPath}" Watermark="/ruta/destino" />
+            <Button Grid.Column="2" Content="Elegir…" Margin="8,0,0,0" Click="OnBrowseTarget" />
+        </Grid>
+
+        <!-- Opciones -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8">
+            <CheckBox Content="Verbose" IsChecked="{Binding Verbose}" />
+            <CheckBox Content="Preservar permisos/tiempos" IsChecked="{Binding Preserve}" />
+            <CheckBox Content="Log a archivo" IsChecked="{Binding LogToFile}" />
+        </StackPanel>
+
+        <!-- Excluir -->
+        <Grid Grid.Row="3" ColumnDefinitions="90,*" Margin="0,0,0,12">
+            <CheckBox Grid.Column="0" Content="Excluir:" IsChecked="{Binding ExcludeEnabled}" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding ExcludePaths}"
+                     IsEnabled="{Binding ExcludeEnabled}"
+                     Watermark="a.txt, carpeta, ... (separadas por coma)" />
+        </Grid>
+
+        <!-- Acciones -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+            <Button Content="Sincronizar" Command="{Binding StartSyncCommand}" MinWidth="120" />
+            <Button Content="Cancelar" Command="{Binding CancelSyncCommand}" MinWidth="100" />
+            <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="12,0,0,0" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!-- Progreso -->
+        <ProgressBar Grid.Row="5" Height="20" Minimum="0" Maximum="100" Value="{Binding Progress}" Margin="0,0,0,12" />
+
+        <!-- Log -->
+        <Border Grid.Row="6" BorderBrush="#33888888" BorderThickness="1" CornerRadius="4">
+            <ListBox ItemsSource="{Binding LogEntries}" />
+        </Border>
+    </Grid>
+</Window>

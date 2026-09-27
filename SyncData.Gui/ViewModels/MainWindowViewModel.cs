@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SyncData.Configuration;
 using SyncData.Core;
+using SyncData.Gui.Localization;
 using SyncData.Gui.Services;
 
 namespace SyncData.Gui.ViewModels;
@@ -13,7 +16,9 @@ namespace SyncData.Gui.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly UiLogger _logger = new();
+    private readonly SettingsService _settingsService;
     private CancellationTokenSource? _cancellationTokenSource;
+    private Language _selectedLanguage;
 
     [ObservableProperty]
     private string _sourcePath = string.Empty;
@@ -40,14 +45,49 @@ public partial class MainWindowViewModel : ObservableObject
     private double _progress;
 
     [ObservableProperty]
-    private string _status = "Listo para sincronizar.";
+    private string _status = Localizer.Instance["Status_Ready"];
 
     [ObservableProperty]
     private bool _isRunning;
 
+    public MainWindowViewModel()
+        : this(new SettingsService())
+    {
+    }
+
+    public MainWindowViewModel(SettingsService settingsService)
+    {
+        _settingsService = settingsService;
+
+        var currentCode = Localizer.Instance.CurrentLanguageCode;
+        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == currentCode) ?? Languages[0];
+    }
+
     public ObservableCollection<string> LogEntries => _logger.Entries;
 
     public UpdateViewModel Update { get; } = new();
+
+    public IReadOnlyList<Language> Languages => Localizer.Instance.AvailableLanguages;
+
+    public Language SelectedLanguage
+    {
+        get => _selectedLanguage;
+        set
+        {
+            if (value is null || !SetProperty(ref _selectedLanguage, value))
+            {
+                return;
+            }
+
+            Localizer.Instance.SetLanguage(value.Code);
+            _settingsService.Save(new AppSettings { Language = value.Code });
+
+            if (!IsRunning)
+            {
+                Status = Localizer.Instance["Status_Ready"];
+            }
+        }
+    }
 
     public bool IsNotRunning => !IsRunning;
 
@@ -67,7 +107,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         IsRunning = true;
         Progress = 0;
-        Status = "Sincronizando...";
+        Status = Localizer.Instance["Status_Syncing"];
         _logger.Clear();
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -80,15 +120,17 @@ public partial class MainWindowViewModel : ObservableObject
 
             var success = await Task.Run(() => app.RunAsync(token), token);
 
-            Status = success ? "Sincronización completada." : "Sincronización finalizada sin completar.";
+            Status = success
+                ? Localizer.Instance["Status_Completed"]
+                : Localizer.Instance["Status_NotCompleted"];
         }
         catch (OperationCanceledException)
         {
-            Status = "Sincronización cancelada.";
+            Status = Localizer.Instance["Status_Cancelled"];
         }
         catch (Exception ex)
         {
-            Status = $"Error: {ex.Message}";
+            Status = Localizer.Instance.Format("Status_Error", ex.Message);
         }
         finally
         {
@@ -102,7 +144,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void CancelSync()
     {
         _cancellationTokenSource?.Cancel();
-        Status = "Cancelando...";
+        Status = Localizer.Instance["Status_Cancelling"];
     }
 
     private SyncConfiguration BuildConfiguration()

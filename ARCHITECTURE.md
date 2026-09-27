@@ -47,8 +47,9 @@ SyncData.Core/                 # Shared library (UI-agnostic)
 │   ├── FileSynchronizer.cs    # Abstract synchronizer base class
 │   ├── BidirectionalSynchronizer.cs # Bidirectional sync implementation
 │   └── SynchronizerFactory.cs # Factory for creating synchronizers
-└── Validation/                # Configuration validation
-    └── ConfigurationValidator.cs
+├── Validation/                # Configuration validation
+│   └── ConfigurationValidator.cs
+└── Localization/              # Core strings (Strings.resx/.es.resx) + CoreLocalizer
 
 SyncData.Cli/                  # Console front-end
 ├── Program.cs                 # Entry point (creates ProgressBar + SyncApplication)
@@ -59,7 +60,8 @@ SyncData.Gui/                  # Avalonia desktop front-end (Linux/Windows/macOS
 ├── Program.cs
 ├── Views/                     # MainWindow.axaml(.cs)
 ├── ViewModels/                # MainWindowViewModel, UpdateViewModel (MVVM)
-└── Services/                  # UiLogger, UiProgress, IUpdateService, VelopackUpdateService
+├── Localization/              # GUI strings (resx) + Localizer
+└── Services/                  # UiLogger, UiProgress, IUpdateService, VelopackUpdateService, SettingsService
 
 SyncData.Tests/                # xUnit tests for SyncData.Core
 ```

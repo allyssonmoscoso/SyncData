@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Synchronization
@@ -34,7 +35,8 @@ namespace SyncData.Synchronization
 
         protected void LogExcluded(string itemType, string path)
         {
-            Logger.LogInfo($"Excluding {itemType}: {path}");
+            var key = itemType == "directory" ? "Log_ExcludingDirectory" : "Log_ExcludingFile";
+            Logger.LogInfo(CoreLocalizer.Format(key, path));
         }
     }
 }

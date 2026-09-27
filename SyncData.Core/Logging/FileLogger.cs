@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 
 namespace SyncData.Logging
 {
@@ -26,7 +27,7 @@ namespace SyncData.Logging
             catch (IOException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Failed to write to log file: {ex.Message}");
+                Console.WriteLine(CoreLocalizer.Format("Log_FileWriteFailed", ex.Message));
                 Console.ResetColor();
             }
         }

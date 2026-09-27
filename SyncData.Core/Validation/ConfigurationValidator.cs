@@ -1,5 +1,6 @@
 using System.IO;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Validation
@@ -20,25 +21,25 @@ namespace SyncData.Validation
         {
             if (!config.IsValid())
             {
-                _logger.LogError("You must provide two directory paths as arguments.");
+                _logger.LogError(CoreLocalizer.Get("Validator_PathsRequired"));
                 return false;
             }
 
             if (config.Exclude && config.ExcludePaths.Count == 0)
             {
-                _logger.LogError("-exclude: You must provide at least one exclude path as an argument.");
+                _logger.LogError(CoreLocalizer.Get("Validator_ExcludeRequired"));
                 return false;
             }
 
             if (config.HasSamePaths())
             {
-                _logger.LogError("The second path cannot be the same as the first.");
+                _logger.LogError(CoreLocalizer.Get("Validator_SamePaths"));
                 return false;
             }
 
             if (!Directory.Exists(config.SourcePath))
             {
-                _logger.LogError("The source path does not exist.");
+                _logger.LogError(CoreLocalizer.Get("Validator_SourceMissing"));
                 return false;
             }
 

@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/allyssonmoscoso/SyncData</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Deterministic>true</Deterministic>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
 </Project>

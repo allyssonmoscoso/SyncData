@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SyncData.Gui.Localization;
 using SyncData.Gui.Services;
 
 namespace SyncData.Gui.ViewModels;
@@ -40,17 +41,25 @@ public partial class UpdateViewModel : ObservableObject
     {
         _updateService = updateService;
         CurrentVersion = _updateService.CurrentVersion;
+
+        // Re-localize dynamic texts when the language changes.
+        Localizer.Instance.PropertyChanged += (_, _) => OnPropertyChanged(nameof(UpdateBannerText));
     }
 
     /// <summary>Updates can only be applied to a Velopack-installed build.</summary>
     public bool CanCheckForUpdates => _updateService.IsInstalled;
+
+    public string UpdateBannerText =>
+        string.IsNullOrEmpty(AvailableVersion)
+            ? string.Empty
+            : Localizer.Instance.Format("Update_Available", AvailableVersion);
 
     [RelayCommand]
     private async Task CheckForUpdatesAsync()
     {
         if (!_updateService.IsInstalled)
         {
-            StatusMessage = "Las actualizaciones solo están disponibles en la versión instalada.";
+            StatusMessage = Localizer.Instance["Update_NotInstalled"];
             return;
         }
 
@@ -60,20 +69,18 @@ public partial class UpdateViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusMessage = "Buscando actualizaciones...";
+        StatusMessage = Localizer.Instance["Update_Checking"];
 
         try
         {
             var available = await _updateService.CheckForUpdatesAsync();
             UpdateAvailable = available;
             AvailableVersion = _updateService.AvailableVersion;
-            StatusMessage = available
-                ? $"Nueva versión disponible: {AvailableVersion}"
-                : "Ya tienes la última versión.";
+            StatusMessage = available ? string.Empty : Localizer.Instance["Update_UpToDate"];
         }
         catch (Exception ex)
         {
-            StatusMessage = $"No se pudo comprobar actualizaciones: {ex.Message}";
+            StatusMessage = Localizer.Instance.Format("Update_CheckFailed", ex.Message);
         }
         finally
         {
@@ -97,10 +104,6 @@ public partial class UpdateViewModel : ObservableObject
             var available = await _updateService.CheckForUpdatesAsync();
             UpdateAvailable = available;
             AvailableVersion = _updateService.AvailableVersion;
-            if (available)
-            {
-                StatusMessage = $"Nueva versión disponible: {AvailableVersion}";
-            }
         }
         catch
         {
@@ -118,18 +121,18 @@ public partial class UpdateViewModel : ObservableObject
 
         IsBusy = true;
         DownloadProgress = 0;
-        StatusMessage = "Descargando actualización...";
+        StatusMessage = Localizer.Instance["Update_Downloading"];
 
         try
         {
             var progress = new Progress<int>(value => DownloadProgress = value);
             await _updateService.DownloadUpdatesAsync(progress);
-            StatusMessage = "Aplicando actualización y reiniciando...";
+            StatusMessage = Localizer.Instance["Update_Applying"];
             _updateService.ApplyUpdatesAndRestart();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"No se pudo actualizar: {ex.Message}";
+            StatusMessage = Localizer.Instance.Format("Update_Failed", ex.Message);
         }
         finally
         {
@@ -149,4 +152,6 @@ public partial class UpdateViewModel : ObservableObject
     partial void OnUpdateAvailableChanged(bool value) => ApplyUpdateCommand.NotifyCanExecuteChanged();
 
     partial void OnIsBusyChanged(bool value) => ApplyUpdateCommand.NotifyCanExecuteChanged();
+
+    partial void OnAvailableVersionChanged(string? value) => OnPropertyChanged(nameof(UpdateBannerText));
 }

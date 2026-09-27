@@ -1,10 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:SyncData.Gui.ViewModels"
+        xmlns:loc="using:SyncData.Gui.Localization"
         x:Class="SyncData.Gui.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="SyncData"
-        Width="760" Height="620"
+        Title="{ReflectionBinding Path=[App_Title], Source={x:Static loc:Localizer.Instance}}"
+        Width="780" Height="640"
         WindowStartupLocation="CenterScreen">
 
     <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
@@ -23,13 +24,13 @@
                     <TextBlock Grid.Column="0"
                                VerticalAlignment="Center"
                                TextWrapping="Wrap"
-                               Text="{Binding Update.AvailableVersion, StringFormat='Nueva versión disponible: {0}'}" />
+                               Text="{Binding Update.UpdateBannerText}" />
                     <Button Grid.Column="1"
-                            Content="Actualizar"
+                            Content="{ReflectionBinding Path=[Action_Update], Source={x:Static loc:Localizer.Instance}}"
                             Margin="8,0,0,0"
                             Command="{Binding Update.ApplyUpdateCommand}" />
                     <Button Grid.Column="2"
-                            Content="Omitir"
+                            Content="{ReflectionBinding Path=[Action_Dismiss], Source={x:Static loc:Localizer.Instance}}"
                             Margin="8,0,0,0"
                             Command="{Binding Update.DismissUpdateCommand}" />
                 </Grid>
@@ -43,37 +44,60 @@
 
         <!-- Origen -->
         <Grid Grid.Row="1" ColumnDefinitions="90,*,Auto" Margin="0,0,0,8">
-            <TextBlock Grid.Column="0" Text="Origen:" VerticalAlignment="Center" />
-            <TextBox Grid.Column="1" Text="{Binding SourcePath}" Watermark="/ruta/origen" />
-            <Button Grid.Column="2" Content="Elegir…" Margin="8,0,0,0" Click="OnBrowseSource" />
+            <TextBlock Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Text="{ReflectionBinding Path=[Label_Source], Source={x:Static loc:Localizer.Instance}}" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding SourcePath}"
+                     Watermark="{ReflectionBinding Path=[Watermark_Source], Source={x:Static loc:Localizer.Instance}}" />
+            <Button Grid.Column="2"
+                    Content="{ReflectionBinding Path=[Action_Choose], Source={x:Static loc:Localizer.Instance}}"
+                    Margin="8,0,0,0"
+                    Click="OnBrowseSource" />
         </Grid>
 
         <!-- Destino -->
         <Grid Grid.Row="2" ColumnDefinitions="90,*,Auto" Margin="0,0,0,8">
-            <TextBlock Grid.Column="0" Text="Destino:" VerticalAlignment="Center" />
-            <TextBox Grid.Column="1" Text="{Binding TargetPath}" Watermark="/ruta/destino" />
-            <Button Grid.Column="2" Content="Elegir…" Margin="8,0,0,0" Click="OnBrowseTarget" />
+            <TextBlock Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Text="{ReflectionBinding Path=[Label_Target], Source={x:Static loc:Localizer.Instance}}" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding TargetPath}"
+                     Watermark="{ReflectionBinding Path=[Watermark_Target], Source={x:Static loc:Localizer.Instance}}" />
+            <Button Grid.Column="2"
+                    Content="{ReflectionBinding Path=[Action_Choose], Source={x:Static loc:Localizer.Instance}}"
+                    Margin="8,0,0,0"
+                    Click="OnBrowseTarget" />
         </Grid>
 
         <!-- Opciones -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8">
-            <CheckBox Content="Verbose" IsChecked="{Binding Verbose}" />
-            <CheckBox Content="Preservar permisos/tiempos" IsChecked="{Binding Preserve}" />
-            <CheckBox Content="Log a archivo" IsChecked="{Binding LogToFile}" />
+            <CheckBox Content="{ReflectionBinding Path=[Option_Verbose], Source={x:Static loc:Localizer.Instance}}"
+                      IsChecked="{Binding Verbose}" />
+            <CheckBox Content="{ReflectionBinding Path=[Option_Preserve], Source={x:Static loc:Localizer.Instance}}"
+                      IsChecked="{Binding Preserve}" />
+            <CheckBox Content="{ReflectionBinding Path=[Option_LogToFile], Source={x:Static loc:Localizer.Instance}}"
+                      IsChecked="{Binding LogToFile}" />
         </StackPanel>
 
         <!-- Excluir -->
         <Grid Grid.Row="4" ColumnDefinitions="90,*" Margin="0,0,0,12">
-            <CheckBox Grid.Column="0" Content="Excluir:" IsChecked="{Binding ExcludeEnabled}" VerticalAlignment="Center" />
-            <TextBox Grid.Column="1" Text="{Binding ExcludePaths}"
+            <CheckBox Grid.Column="0"
+                      Content="{ReflectionBinding Path=[Label_Exclude], Source={x:Static loc:Localizer.Instance}}"
+                      IsChecked="{Binding ExcludeEnabled}"
+                      VerticalAlignment="Center" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding ExcludePaths}"
                      IsEnabled="{Binding ExcludeEnabled}"
-                     Watermark="a.txt, carpeta, ... (separadas por coma)" />
+                     Watermark="{ReflectionBinding Path=[Watermark_Exclude], Source={x:Static loc:Localizer.Instance}}" />
         </Grid>
 
         <!-- Acciones -->
         <StackPanel Grid.Row="5" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
-            <Button Content="Sincronizar" Command="{Binding StartSyncCommand}" MinWidth="120" />
-            <Button Content="Cancelar" Command="{Binding CancelSyncCommand}" MinWidth="100" />
+            <Button Content="{ReflectionBinding Path=[Action_Sync], Source={x:Static loc:Localizer.Instance}}"
+                    Command="{Binding StartSyncCommand}" MinWidth="120" />
+            <Button Content="{ReflectionBinding Path=[Action_Cancel], Source={x:Static loc:Localizer.Instance}}"
+                    Command="{Binding CancelSyncCommand}" MinWidth="100" />
             <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="12,0,0,0" TextWrapping="Wrap" />
         </StackPanel>
 
@@ -85,20 +109,36 @@
             <ListBox ItemsSource="{Binding LogEntries}" />
         </Border>
 
-        <!-- Update footer -->
-        <Grid Grid.Row="8" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
+        <!-- Footer: status, language, version and update check -->
+        <Grid Grid.Row="8" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,12,0,0">
             <TextBlock Grid.Column="0"
                        VerticalAlignment="Center"
                        TextWrapping="Wrap"
                        Opacity="0.85"
                        Text="{Binding Update.StatusMessage}" />
-            <TextBlock Grid.Column="1"
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="8,0">
+                <TextBlock VerticalAlignment="Center"
+                           Text="{ReflectionBinding Path=[Label_Language], Source={x:Static loc:Localizer.Instance}}" />
+                <ComboBox ItemsSource="{Binding Languages}"
+                          SelectedItem="{Binding SelectedLanguage}"
+                          MinWidth="120">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="loc:Language">
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <TextBlock Grid.Column="2"
                        VerticalAlignment="Center"
                        Margin="8,0"
                        Opacity="0.6"
                        Text="{Binding Update.CurrentVersion, StringFormat='v{0}'}" />
-            <Button Grid.Column="2"
-                    Content="Buscar actualizaciones"
+
+            <Button Grid.Column="3"
+                    Content="{ReflectionBinding Path=[Action_CheckUpdates], Source={x:Static loc:Localizer.Instance}}"
                     Command="{Binding Update.CheckForUpdatesCommand}" />
         </Grid>
     </Grid>

@@ -1,12 +1,18 @@
+using System;
 using System.Threading.Tasks;
+using SyncData.Gui.Localization;
 using SyncData.Gui.ViewModels;
 using SyncData.Test.TestDoubles;
 using Xunit;
 
 namespace SyncData.Test
 {
-    public class UpdateViewModelTests
+    public class UpdateViewModelTests : IDisposable
     {
+        public UpdateViewModelTests() => Localizer.Instance.SetLanguage("en");
+
+        public void Dispose() => Localizer.Instance.SetLanguage("en");
+
         [Fact]
         public void Constructor_ExposesCurrentVersion()
         {
@@ -33,6 +39,7 @@ namespace SyncData.Test
             Assert.True(viewModel.UpdateAvailable);
             Assert.Equal("1.0.1", viewModel.AvailableVersion);
             Assert.True(viewModel.ApplyUpdateCommand.CanExecute(null));
+            Assert.Contains("New version available", viewModel.UpdateBannerText);
         }
 
         [Fact]
@@ -45,7 +52,7 @@ namespace SyncData.Test
 
             Assert.False(viewModel.UpdateAvailable);
             Assert.False(viewModel.ApplyUpdateCommand.CanExecute(null));
-            Assert.Contains("última versión", viewModel.StatusMessage);
+            Assert.Contains("latest version", viewModel.StatusMessage);
         }
 
         [Fact]
@@ -58,7 +65,7 @@ namespace SyncData.Test
 
             Assert.False(service.CheckCalled);
             Assert.False(viewModel.UpdateAvailable);
-            Assert.Contains("instalada", viewModel.StatusMessage);
+            Assert.Contains("installed build", viewModel.StatusMessage);
         }
 
         [Fact]
@@ -70,7 +77,7 @@ namespace SyncData.Test
             await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
             Assert.False(viewModel.UpdateAvailable);
-            Assert.Contains("No se pudo comprobar", viewModel.StatusMessage);
+            Assert.Contains("Could not check for updates", viewModel.StatusMessage);
         }
 
         [Fact]
@@ -108,7 +115,7 @@ namespace SyncData.Test
             await viewModel.CheckForUpdatesSilentlyAsync();
 
             Assert.True(viewModel.UpdateAvailable);
-            Assert.Contains("Nueva versión disponible", viewModel.StatusMessage);
+            Assert.Contains("New version available", viewModel.UpdateBannerText);
         }
 
         [Fact]
@@ -121,6 +128,18 @@ namespace SyncData.Test
 
             Assert.False(service.CheckCalled);
             Assert.False(viewModel.UpdateAvailable);
+        }
+
+        [Fact]
+        public async Task CheckForUpdates_WhenSpanish_LocalizesMessages()
+        {
+            Localizer.Instance.SetLanguage("es");
+            var service = new FakeUpdateService { IsInstalled = true, HasUpdate = true };
+            var viewModel = new UpdateViewModel(service);
+
+            await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
+
+            Assert.Contains("Nueva versión disponible", viewModel.UpdateBannerText);
         }
     }
 }

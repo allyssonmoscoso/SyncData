@@ -21,6 +21,7 @@ SyncData is a cross-platform tool (desktop GUI + console) that synchronizes file
 - Exclude specific files or directories from synchronization. ✅
 - Preserve file permissions and timestamps. ✅
 - Auto-update: installed builds check GitHub Releases and offer to update (Windows/macOS). ⚠️
+- Bilingual UI: English (default) and Spanish, switchable at runtime and remembered. ✅
 - **Upcoming Features:**
     - Differential synchronization to only copy changed files. 🛑
     - Compression support to reduce data transfer size. 🛑
@@ -46,6 +47,16 @@ SyncData is a cross-platform tool (desktop GUI + console) that synchronizes file
 - `SyncData.Cli` — console front-end.
 - `SyncData.Gui` — desktop front-end built with [Avalonia UI](https://avaloniaui.net/) (Linux, Windows and macOS).
 - `SyncData.Tests` — xUnit test suite for `SyncData.Core`.
+
+## Languages
+
+The GUI ships in **English (default)** and **Spanish**. Pick the language from the
+selector in the window footer; the change applies instantly and is saved to
+`settings.json` in the user config folder (`~/.config`, `%APPDATA%` or
+`~/Library/Application Support`).
+
+Messages are also localized inside the core library (validation and log output),
+so the log panel follows the selected language too.
 
 ## Usage
 

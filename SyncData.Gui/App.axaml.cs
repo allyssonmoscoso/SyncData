@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using SyncData.Gui.Localization;
+using SyncData.Gui.Services;
 using SyncData.Gui.ViewModels;
 using SyncData.Gui.Views;
 
@@ -17,6 +19,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Restore the saved language before creating the UI.
+            var settings = new SettingsService().Load();
+            Localizer.Instance.SetLanguage(settings.Language);
+
             var viewModel = new MainWindowViewModel();
             desktop.MainWindow = new MainWindow
             {

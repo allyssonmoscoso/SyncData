@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Synchronization
@@ -42,7 +43,7 @@ namespace SyncData.Synchronization
             }
 
             var endTime = DateTime.Now;
-            _logger.LogSuccess($"File synchronized: {SourcePath} -> {TargetPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+            _logger.LogSuccess(CoreLocalizer.Format("Log_FileSynchronized", SourcePath, TargetPath, (endTime - startTime).TotalMilliseconds));
         }
     }
 }

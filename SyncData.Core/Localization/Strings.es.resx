@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Validator_PathsRequired" xml:space="preserve"><value>Debes proporcionar dos rutas de directorio como argumentos.</value></data>
+  <data name="Validator_ExcludeRequired" xml:space="preserve"><value>-exclude: Debes proporcionar al menos una ruta a excluir como argumento.</value></data>
+  <data name="Validator_SamePaths" xml:space="preserve"><value>La segunda ruta no puede ser igual a la primera.</value></data>
+  <data name="Validator_SourceMissing" xml:space="preserve"><value>La ruta de origen no existe.</value></data>
+  <data name="Sync_Completed" xml:space="preserve"><value>Sincronización completada.</value></data>
+  <data name="Sync_Cancelled" xml:space="preserve"><value>Sincronización cancelada.</value></data>
+  <data name="Sync_Failed" xml:space="preserve"><value>La sincronización falló: {0}</value></data>
+  <data name="Log_DirectoryCreated" xml:space="preserve"><value>Directorio creado: {0}</value></data>
+  <data name="Log_DirectoryCreatedTimed" xml:space="preserve"><value>Directorio creado: {0} (Tiempo: {1} ms)</value></data>
+  <data name="Log_FileSynchronized" xml:space="preserve"><value>Archivo sincronizado: {0} -&gt; {1} (Tiempo: {2} ms)</value></data>
+  <data name="Log_ExcludingFile" xml:space="preserve"><value>Excluyendo archivo: {0}</value></data>
+  <data name="Log_ExcludingDirectory" xml:space="preserve"><value>Excluyendo directorio: {0}</value></data>
+  <data name="Log_FileWriteFailed" xml:space="preserve"><value>No se pudo escribir en el archivo de log: {0}</value></data>
+  <data name="Ftp_NotImplemented" xml:space="preserve"><value>La sincronización por FTP aún no está implementada</value></data>
+</root>

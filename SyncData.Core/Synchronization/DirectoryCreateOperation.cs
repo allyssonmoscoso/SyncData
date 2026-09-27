@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Synchronization
@@ -32,7 +33,7 @@ namespace SyncData.Synchronization
             await Task.Run(() => Directory.CreateDirectory(TargetPath), cancellationToken);
             var endTime = DateTime.Now;
 
-            _logger.LogInfo($"Directory created: {TargetPath} (Time: {(endTime - startTime).TotalMilliseconds} ms)");
+            _logger.LogInfo(CoreLocalizer.Format("Log_DirectoryCreatedTimed", TargetPath, (endTime - startTime).TotalMilliseconds));
         }
     }
 }

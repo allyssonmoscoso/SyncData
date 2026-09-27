@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Validator_PathsRequired" xml:space="preserve"><value>You must provide two directory paths as arguments.</value></data>
+  <data name="Validator_ExcludeRequired" xml:space="preserve"><value>-exclude: You must provide at least one exclude path as an argument.</value></data>
+  <data name="Validator_SamePaths" xml:space="preserve"><value>The second path cannot be the same as the first.</value></data>
+  <data name="Validator_SourceMissing" xml:space="preserve"><value>The source path does not exist.</value></data>
+  <data name="Sync_Completed" xml:space="preserve"><value>Synchronization completed.</value></data>
+  <data name="Sync_Cancelled" xml:space="preserve"><value>Synchronization cancelled.</value></data>
+  <data name="Sync_Failed" xml:space="preserve"><value>Synchronization failed: {0}</value></data>
+  <data name="Log_DirectoryCreated" xml:space="preserve"><value>Directory created: {0}</value></data>
+  <data name="Log_DirectoryCreatedTimed" xml:space="preserve"><value>Directory created: {0} (Time: {1} ms)</value></data>
+  <data name="Log_FileSynchronized" xml:space="preserve"><value>File synchronized: {0} -&gt; {1} (Time: {2} ms)</value></data>
+  <data name="Log_ExcludingFile" xml:space="preserve"><value>Excluding file: {0}</value></data>
+  <data name="Log_ExcludingDirectory" xml:space="preserve"><value>Excluding directory: {0}</value></data>
+  <data name="Log_FileWriteFailed" xml:space="preserve"><value>Failed to write to log file: {0}</value></data>
+  <data name="Ftp_NotImplemented" xml:space="preserve"><value>FTP synchronization not yet implemented</value></data>
+</root>

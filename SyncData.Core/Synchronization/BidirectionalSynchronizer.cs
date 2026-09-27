@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Synchronization
@@ -28,7 +29,7 @@ namespace SyncData.Synchronization
             if (!Directory.Exists(Config.TargetPath))
             {
                 Directory.CreateDirectory(Config.TargetPath);
-                Logger.LogInfo($"Directory created: {Config.TargetPath}");
+                Logger.LogInfo(CoreLocalizer.Format("Log_DirectoryCreated", Config.TargetPath));
             }
 
             await SynchronizeDirectoriesAsync(Config.SourcePath, Config.TargetPath, cancellationToken);

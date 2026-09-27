@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 using SyncData.Synchronization;
 using SyncData.Validation;
@@ -41,17 +42,17 @@ namespace SyncData.Core
 
                 await synchronizer.SynchronizeAsync(cancellationToken);
 
-                _logger.LogSuccess("Synchronization completed.");
+                _logger.LogSuccess(CoreLocalizer.Get("Sync_Completed"));
                 return true;
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInfo("Synchronization cancelled.");
+                _logger.LogInfo(CoreLocalizer.Get("Sync_Cancelled"));
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Synchronization failed: {ex.Message}");
+                _logger.LogError(CoreLocalizer.Format("Sync_Failed", ex.Message));
                 return false;
             }
         }

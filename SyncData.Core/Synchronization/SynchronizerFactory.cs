@@ -1,5 +1,6 @@
 using System;
 using SyncData.Configuration;
+using SyncData.Core.Localization;
 using SyncData.Logging;
 
 namespace SyncData.Synchronization
@@ -27,7 +28,7 @@ namespace SyncData.Synchronization
             if (config.UseFtp)
             {
                 // Future: return new FtpSynchronizer(config, logger, progressReporter);
-                throw new NotImplementedException("FTP synchronization not yet implemented");
+                throw new NotImplementedException(CoreLocalizer.Get("Ftp_NotImplemented"));
             }
 
             // Default to bidirectional synchronizer

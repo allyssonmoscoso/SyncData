@@ -103,7 +103,10 @@ namespace SyncData.Synchronization
             _progress++;
             if (_totalOperations > 0)
             {
-                ProgressReporter?.Report((double)_progress / _totalOperations);
+                // Clamp to the IProgress contract (0..1); the operation count can
+                // underestimate work across both directions and recursive passes.
+                var value = Math.Min(1.0, (double)_progress / _totalOperations);
+                ProgressReporter?.Report(value);
             }
         }
     }

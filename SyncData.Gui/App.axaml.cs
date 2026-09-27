@@ -17,10 +17,17 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var viewModel = new MainWindowViewModel();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel()
+                DataContext = viewModel
             };
+
+            // Check for updates in the background on startup (only when installed).
+            if (viewModel.Update.CanCheckForUpdates)
+            {
+                _ = viewModel.Update.CheckForUpdatesSilentlyAsync();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

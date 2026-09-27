@@ -58,8 +58,8 @@ SyncData.Gui/                  # Avalonia desktop front-end (Linux/Windows/macOS
 ├── App.axaml(.cs)
 ├── Program.cs
 ├── Views/                     # MainWindow.axaml(.cs)
-├── ViewModels/                # MainWindowViewModel (MVVM)
-└── Services/                  # UiLogger, UiProgress
+├── ViewModels/                # MainWindowViewModel, UpdateViewModel (MVVM)
+└── Services/                  # UiLogger, UiProgress, IUpdateService, VelopackUpdateService
 
 SyncData.Tests/                # xUnit tests for SyncData.Core
 ```

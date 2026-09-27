@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SyncData.Core\SyncData.Core.csproj" />
+        <ProjectReference Include="..\SyncData.Gui\SyncData.Gui.csproj" />
     </ItemGroup>
 
 </Project>

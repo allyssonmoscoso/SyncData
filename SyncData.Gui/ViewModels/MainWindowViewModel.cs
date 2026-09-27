@@ -47,6 +47,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     public ObservableCollection<string> LogEntries => _logger.Entries;
 
+    public UpdateViewModel Update { get; } = new();
+
     public bool IsNotRunning => !IsRunning;
 
     partial void OnIsRunningChanged(bool value)

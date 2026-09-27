@@ -20,6 +20,7 @@ SyncData is a cross-platform tool (desktop GUI + console) that synchronizes file
 - Option to log messages to a file. ✅
 - Exclude specific files or directories from synchronization. ✅
 - Preserve file permissions and timestamps. ✅
+- Auto-update: installed builds check GitHub Releases and offer to update (Windows/macOS). ⚠️
 - **Upcoming Features:**
     - Differential synchronization to only copy changed files. 🛑
     - Compression support to reduce data transfer size. 🛑
@@ -107,7 +108,21 @@ Artifacts are written to `artifacts/` (git-ignored):
 > Note: Windows `Setup.exe` and macOS `.dmg` must be built on their own OS (run the
 > scripts there). Code signing and Apple notarization are out of scope for now.
 
-## Continuous Integration
+## Auto-update
+
+Installed builds (via Velopack) check the latest GitHub Release on startup and
+show a banner with an **Actualizar** button when a newer version is available.
+This relies on the update feed published by the release workflow
+(`RELEASES-*`, `releases.*.json`, `.nupkg`).
+
+- Works on **Windows and macOS** installed builds; portable builds and the Linux
+  `.deb`/AppImage do not self-update.
+- On macOS, updates require the app to be signed/notarized (planned for a later
+  phase).
+- Architecture: `IUpdateService` (abstraction) + `VelopackUpdateService`
+  (Velopack `UpdateManager` over `GithubSource`) + `UpdateViewModel`.
+
+## CI / Releases
 
 - **CI** (`.github/workflows/ci.yml`): on every push/PR to `main`/`develop` it builds and runs the test suite on Linux.
 - **Release** (`.github/workflows/release.yml`): triggered by a `v*` tag or manually (`workflow_dispatch`). It packages the app on Linux, Windows and macOS with Velopack and publishes a GitHub Release with the artifacts.
